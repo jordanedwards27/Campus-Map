@@ -1235,10 +1235,10 @@ function convertDriveUrl(url){
   return url;
 }
 function convertDriveUrl360(url){
-  // Use higher resolution for 360° equirectangular images
-  const m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-  if(m) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w4096';
-  return url;
+  // 360° images require CORS headers — Google Drive doesn't provide them.
+  // Upload JPGs to GitHub (same folder as index.html) and use relative paths like: 360/admissions.jpg
+  // Any direct-hosted URL (GitHub Pages, your own server) will work.
+  return url.trim();
 }
 
 // ─────────────────────────────────────────
@@ -1542,7 +1542,8 @@ function renderAdminRooms(){
         </div>
         <div style="margin-bottom:6px">
           <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">360° Photo URL (optional)</label>
-          <input class="ap-input apr-tour360" type="url" value="${escHtml(room.tour360||'')}" placeholder="Paste Drive link to equirectangular 360° JPG…">
+          <input class="ap-input apr-tour360" type="text" value="${escHtml(room.tour360||'')}" placeholder="Relative path or direct URL — e.g. 360/admissions.jpg (not Google Drive)">
+          <div style="font-size:9.5px;color:#e67e22;margin-top:3px">⚠ Google Drive links won't work here. Upload the JPG to your GitHub repo and use a relative path like <b>360/admissions.jpg</b></div>
         </div>
         <div>
           <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">Photos</label>
