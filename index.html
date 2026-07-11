@@ -1103,9 +1103,9 @@ function closePopup(){
 function toggleAdmin(){
   if(!adminMode){
     const _k=[110,111,114,116,104,119,101,115,116].map(c=>String.fromCharCode(c)).join('');
-    const input=prompt('Admin password:');
+    const input=prompt('Enter admin password:');
     if(input===null) return;
-    if(input!==_k){showToast('Incorrect password');return;}
+    if(input.toLowerCase()!==_k){showToast('Incorrect password ✗');return;}
   }
   adminMode=!adminMode;
   document.body.classList.toggle('admin-on',adminMode);
