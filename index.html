@@ -746,17 +746,8 @@ const BLDGS = [
 ];
 // __BLDGS_DATA_END__
 
-// Load any saved overrides from localStorage
-(function loadSaved(){
-  try{
-    const saved = localStorage.getItem('fhnw_bldgs');
-    if(saved){
-      const data = JSON.parse(saved);
-      BLDGS.length = 0;
-      data.forEach(b => BLDGS.push(b));
-    }
-  }catch(e){}
-})();
+// Clear any stale localStorage building data — Google Sheets is now the source of truth
+try{localStorage.removeItem('fhnw_bldgs');}catch(e){}
 
 // ─────────────────────────────────────────
 // MAP STATE
@@ -1312,7 +1303,6 @@ function highlightSidebar(id){
 // PERSISTENCE
 // ─────────────────────────────────────────
 function persist(){
-  try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
   const url=localStorage.getItem('fhnw_sheets_url');
   if(url) pushToSheets(false);
 }
