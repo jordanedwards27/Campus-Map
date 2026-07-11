@@ -185,6 +185,18 @@ body.admin-on #add-fab{display:block;}
 .ap-close{background:none;border:none;color:#aaa;font-size:22px;cursor:pointer;line-height:1;}
 .ap-close:hover{color:white;}
 .ap-body{padding:14px 16px 16px;}
+/* ── Sheets settings panel ── */
+#sheets-panel{background:#f9f9f9;border-bottom:1px solid #eee;padding:12px 16px;display:none;}
+body.admin-on #sheets-panel{display:block;}
+.sp-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);margin-bottom:8px;}
+.sp-row{display:flex;gap:8px;align-items:center;margin-bottom:6px;}
+.sp-input{flex:1;padding:6px 9px;border:1.5px solid #ddd;border-radius:6px;font-size:11.5px;font-family:'Barlow','Segoe UI',sans-serif;outline:none;}
+.sp-input:focus{border-color:var(--accent);}
+.sp-btn{padding:6px 11px;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Barlow','Segoe UI',sans-serif;}
+.sp-save{background:var(--accent);color:#fff;}
+.sp-push{background:#2e6e2e;color:#fff;}
+.sp-status{font-size:10px;color:#888;margin-top:2px;min-height:14px;}
+.sp-status.ok{color:#2e6e2e;} .sp-status.err{color:var(--admin-red);}
 .ap-grid{display:grid;grid-template-columns:80px 1fr;gap:10px;margin-bottom:10px;}
 .ap-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .ap-field{margin-bottom:10px;}
@@ -407,6 +419,19 @@ body.admin-on #admin-save-bar{display:flex;}
 
     <!-- Add FAB -->
     <button id="add-fab" onclick="startAddMode()">+ Add Building</button>
+
+    <!-- Google Sheets settings (visible in admin mode) -->
+    <div id="sheets-panel">
+      <div class="sp-title">🔗 Google Sheets Connection</div>
+      <div class="sp-row">
+        <input class="sp-input" id="sp-url" type="url" placeholder="Paste your Apps Script Web App URL here…">
+        <button class="sp-btn sp-save" onclick="saveSheetUrl()">Connect</button>
+      </div>
+      <div class="sp-row">
+        <button class="sp-btn sp-push" onclick="pushToSheets(true)">⬆ Push map data to Sheet</button>
+      </div>
+      <div class="sp-status" id="sp-status"></div>
+    </div>
 
     <!-- Admin edit panel -->
     <div id="admin-panel" class="">
@@ -1017,19 +1042,37 @@ function renderPhotoThumbs(){
   });
 }
 
+function compressImage(dataURL){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=800;
+      const scale=Math.min(1,MAX/img.width);
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*scale);
+      c.height=Math.round(img.height*scale);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',0.7));
+    };
+    img.src=dataURL;
+  });
+}
+
 function handlePhotoUpload(input){
   const files=Array.from(input.files);
   let loaded=0;
   files.forEach(file=>{
     const reader=new FileReader();
     reader.onload=ev=>{
-      _adminPhotos.push(ev.target.result);
-      loaded++;
-      if(loaded===files.length) renderPhotoThumbs();
+      compressImage(ev.target.result).then(compressed=>{
+        _adminPhotos.push(compressed);
+        loaded++;
+        if(loaded===files.length) renderPhotoThumbs();
+      });
     };
     reader.readAsDataURL(file);
   });
-  input.value=''; // reset so same file can be re-added
+  input.value='';
 }
 
 let sliderIdx=0,sliderPhotos=[];
@@ -1270,6 +1313,55 @@ function highlightSidebar(id){
 // ─────────────────────────────────────────
 function persist(){
   try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
+  const url=localStorage.getItem('fhnw_sheets_url');
+  if(url) pushToSheets(false);
+}
+
+// ─────────────────────────────────────────
+// GOOGLE SHEETS SYNC
+// ─────────────────────────────────────────
+function sheetStatus(msg,cls=''){
+  const el=document.getElementById('sp-status');
+  if(!el) return;
+  el.textContent=msg; el.className='sp-status '+(cls||'');
+}
+
+function saveSheetUrl(){
+  const url=document.getElementById('sp-url').value.trim();
+  if(!url){sheetStatus('Please paste a URL first','err');return;}
+  localStorage.setItem('fhnw_sheets_url',url);
+  sheetStatus('Connected! Click "Push map data to Sheet" to upload your buildings.','ok');
+}
+
+function pushToSheets(showFeedback){
+  const url=localStorage.getItem('fhnw_sheets_url');
+  if(!url){if(showFeedback)sheetStatus('No Sheet connected yet','err');return;}
+  if(showFeedback) sheetStatus('Saving…');
+  // Send as plain text to avoid CORS preflight
+  fetch(url,{method:'POST',body:JSON.stringify(BLDGS)})
+    .then(r=>r.text())
+    .then(()=>{
+      if(showFeedback) sheetStatus('Saved to Sheet ✓','ok');
+      else showToast('Synced to Sheet ✓');
+    })
+    .catch(()=>{
+      if(showFeedback) sheetStatus('Save failed — check the URL','err');
+      else showToast('Sheet sync failed');
+    });
+}
+
+function loadFromSheets(url){
+  fetch(url)
+    .then(r=>r.json())
+    .then(data=>{
+      if(!Array.isArray(data)||!data.length) return;
+      BLDGS.length=0;
+      data.forEach(b=>BLDGS.push(b));
+      try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
+      buildSidebar(); render();
+      sheetStatus('Loaded from Sheet ✓','ok');
+    })
+    .catch(()=>sheetStatus('Could not load from Sheet','err'));
 }
 
 function exportHTML(){
@@ -1309,6 +1401,17 @@ new ResizeObserver(()=>render()).observe(outer);
 mkrLayer.innerHTML=''; // clear pre-baked markers so they're recreated with event listeners
 buildSidebar();
 render();
+
+// Default Sheets URL — pre-connected, no setup needed
+const SHEETS_DEFAULT='https://script.google.com/macros/s/AKfycbzxoDIiK8iLTEs5KvfKv7L1aNhwhsvEW2449_isjnAeaLnBAA9YxTfWvHelJxYYxlV_/exec';
+if(!localStorage.getItem('fhnw_sheets_url')) localStorage.setItem('fhnw_sheets_url',SHEETS_DEFAULT);
+
+// Restore saved Sheets URL into settings input
+const _savedUrl=localStorage.getItem('fhnw_sheets_url');
+const _spInp=document.getElementById('sp-url');
+if(_spInp) _spInp.value=_savedUrl;
+// Load fresh data from Sheets on every page load
+loadFromSheets(_savedUrl);
 </script>
 
 
