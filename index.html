@@ -171,7 +171,9 @@ body.admin-on #add-fab{display:block;}
   background:white;border-top:3px solid var(--admin-red);
   transform:translateY(100%);transition:transform .25s ease;
   box-shadow:0 -4px 20px rgba(0,0,0,0.2);
-  max-height:60%;overflow-y:auto;
+  max-height:70%;overflow-y:scroll;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
 }
 #admin-panel.open{transform:translateY(0);}
 .ap-head{
@@ -1220,6 +1222,12 @@ function closeAdminPanel(){
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('sel'));
   render();
 }
+
+// Stop scroll/wheel/touch on admin panel from panning the map
+apanel.addEventListener('wheel',e=>e.stopPropagation(),{passive:true});
+apanel.addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
+document.getElementById('sheets-panel').addEventListener('wheel',e=>e.stopPropagation(),{passive:true});
+document.getElementById('sheets-panel').addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
 
 function saveBuilding(){
   const b=BLDGS.find(x=>x.id===editingId); if(!b) return;
