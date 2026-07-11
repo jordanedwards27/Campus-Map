@@ -1353,12 +1353,21 @@ function loadFromSheets(url){
   fetch(url)
     .then(r=>r.json())
     .then(data=>{
-      if(!Array.isArray(data)||!data.length) return;
+      if(!Array.isArray(data)||!data.length){
+        // Sheet is empty — suggest pushing current buildings up
+        sheetStatus('Sheet is empty — click "Push map data to Sheet" to upload your buildings.','err');
+        return;
+      }
+      // Only replace local buildings if the sheet has more (prevents partial overwrites)
+      if(data.length < BLDGS.length){
+        sheetStatus(`Sheet has ${data.length} building(s) but map has ${BLDGS.length} — click Push to sync all to Sheet.`,'err');
+        return;
+      }
       BLDGS.length=0;
       data.forEach(b=>BLDGS.push(b));
       try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
       buildSidebar(); render();
-      sheetStatus('Loaded from Sheet ✓','ok');
+      sheetStatus(`Loaded ${data.length} buildings from Sheet ✓`,'ok');
     })
     .catch(()=>sheetStatus('Could not load from Sheet','err'));
 }
