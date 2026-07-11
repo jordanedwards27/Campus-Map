@@ -846,12 +846,9 @@ let dragState=null; // {id, startX, startY, startLat, startLng, moved}
 function onMarkerMousedown(e,id){
   if(addMode) return;
   e.stopPropagation();
-  if(adminMode){
-    dragState={id,startX:e.clientX,startY:e.clientY,moved:false};
-    const b=BLDGS.find(x=>x.id===id);
-    if(b){dragState.startLat=b.lat;dragState.startLng=b.lng;}
-    document.getElementById('mk_'+id).classList.add('dragging');
-  }
+  const b=BLDGS.find(x=>x.id===id);
+  dragState={id,startX:e.clientX,startY:e.clientY,moved:false,startLat:b?.lat,startLng:b?.lng};
+  if(adminMode) document.getElementById('mk_'+id).classList.add('dragging');
   e.preventDefault();
 }
 function onMarkerTouchstart(e,id){
@@ -1007,7 +1004,7 @@ function buildSlider(photos){
   const next=document.getElementById('pop-slider-next');
   if(!photos.length){el.style.display='none';track.innerHTML='';dots.innerHTML='';return;}
   el.style.display='block';
-  track.innerHTML=photos.map(u=>`<img src="${u}" alt="">`).join('');
+  track.innerHTML=photos.map(u=>`<img src="${u}" alt="" onerror="this.style.display='none'">`).join('');
   dots.innerHTML=photos.map((_,i)=>`<span class="pop-slider-dot${i===0?' active':''}" onclick="sliderGoto(${i})"></span>`).join('');
   prev.style.display=photos.length>1?'block':'none';
   next.style.display=photos.length>1?'block':'none';
@@ -1066,10 +1063,16 @@ function closePopup(){
 })();
 
 function toggleAdmin(){
+  if(!adminMode){
+    const _k=[110,111,114,116,104,119,101,115,116].map(c=>String.fromCharCode(c)).join('');
+    const input=prompt('Admin password:');
+    if(input===null) return;
+    if(input!==_k){showToast('Incorrect password');return;}
+  }
   adminMode=!adminMode;
   document.body.classList.toggle('admin-on',adminMode);
   if(!adminMode){cancelAddMode();closeAdminPanel();}
-  showToast(adminMode?'Admin mode on':'Admin mode off');
+  showToast(adminMode?'Admin mode on ✓':'Admin mode off');
   render();
 }
 
