@@ -119,8 +119,26 @@ body.admin-on .bm.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,0.5);z-i
 .pop-body{padding:11px 14px;}
 .pop-desc{font-size:11.5px;color:#555;line-height:1.65;margin-bottom:8px;}
 .pop-rl{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);font-weight:700;margin-bottom:5px;}
-.pop-room{font-size:11.5px;color:#333;padding:4px 0;border-bottom:1px solid #f0f0f0;}
+/* expandable room cards */
+.pop-room{padding:5px 0;border-bottom:1px solid #f0f0f0;cursor:default;}
 .pop-room:last-child{border-bottom:none;}
+.pop-room.pop-room-x{cursor:pointer;}
+.pop-room-head{display:flex;align-items:center;gap:6px;user-select:none;}
+.pop-room-arrow{font-size:9px;color:#bbb;flex-shrink:0;width:10px;text-align:center;transition:transform .15s;}
+.pop-room.open .pop-room-arrow{transform:rotate(90deg);}
+.pop-room-dot{width:4px;height:4px;background:#ccc;border-radius:50%;flex-shrink:0;margin:0 3px;}
+.pop-room-name{font-size:11.5px;color:#333;flex:1;line-height:1.35;}
+.pop-room-badges{font-size:10px;color:#aaa;display:flex;gap:3px;}
+.pop-room-body{display:none;padding:7px 0 3px 16px;}
+.pop-room.open .pop-room-body{display:block;}
+.pop-room-mini-wrap{position:relative;width:100%;height:110px;overflow:hidden;background:#111;border-radius:5px;margin-bottom:6px;}
+.pop-room-mini-wrap img{width:100%;height:110px;object-fit:cover;display:block;}
+.pop-room-mini-nav{position:absolute;top:50%;transform:translateY(-50%);width:100%;display:flex;justify-content:space-between;pointer-events:none;}
+.pop-room-mini-btn{pointer-events:all;background:rgba(0,0,0,.5);color:#fff;border:none;padding:4px 8px;cursor:pointer;font-size:14px;}
+.pop-room-mini-btn:hover{background:rgba(0,0,0,.75);}
+.pop-room-mini-count{position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;}
+.pop-room-link{display:inline-block;margin-top:2px;padding:5px 11px;background:var(--accent);color:white!important;border-radius:4px;text-decoration:none!important;font-size:11px;font-weight:700;}
+.pop-room-link:hover{opacity:.85;}
 
 /* ── Map controls ── */
 .map-ctrl{position:absolute;top:12px;right:12px;z-index:300;display:flex;flex-direction:column;gap:5px;}
@@ -272,12 +290,14 @@ body.admin-on #admin-save-bar{display:flex;}
   .shell{height:calc(100vh - 56px);}
   #mob-menu-btn{display:block;}
 
-  /* Sidebar → slide-out drawer */
+  /* Sidebar → slide-out drawer fixed below header */
   .sidebar{
-    position:absolute;top:0;bottom:0;left:-260px;
-    z-index:500;transition:left .25s ease;width:252px;
+    position:fixed;top:56px;bottom:0;left:0;
+    width:252px;z-index:500;
+    transform:translateX(-100%);transition:transform .25s ease;
   }
-  .sidebar.sb-open{left:0;box-shadow:4px 0 20px rgba(0,0,0,.3);}
+  .sidebar.sb-open{transform:translateX(0);box-shadow:4px 0 20px rgba(0,0,0,.3);}
+  #sb-overlay{top:56px;}
 
   /* Larger markers for finger taps */
   .bm{width:32px;height:32px;font-size:11px;border-width:2px;}
@@ -307,6 +327,17 @@ body.admin-on #admin-save-bar{display:flex;}
   /* Admin save bar compact */
   .asb-msg{display:none;}
 }
+
+/* ── Admin room editor ── */
+.ap-room-item{border:1.5px solid #eee;border-radius:6px;padding:9px;margin-bottom:8px;background:#fafafa;}
+.ap-room-header{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ap-room-num{background:var(--accent);color:white;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;}
+.ap-room-del{background:none;border:none;color:#c0392b;font-size:17px;cursor:pointer;padding:0 3px;line-height:1;margin-left:auto;flex-shrink:0;}
+.ap-room-del:hover{color:#ff3333;}
+.ap-room-details{padding-left:25px;}
+.ap-room-photo-row{display:flex;gap:5px;align-items:center;margin-bottom:5px;}
+.ap-add-room-btn{width:100%;padding:8px;border:2px dashed #ddd;background:none;border-radius:6px;font-size:11.5px;color:#aaa;cursor:pointer;font-family:'Barlow','Segoe UI',sans-serif;font-weight:700;margin-top:2px;transition:border-color .15s,color .15s;}
+.ap-add-room-btn:hover{border-color:var(--accent);color:var(--accent);}
 </style>
 <style type="text/css">:where(html[dir="ltr"]),:where([data-sonner-toaster][dir="ltr"]){--toast-icon-margin-start: -3px;--toast-icon-margin-end: 4px;--toast-svg-margin-start: -1px;--toast-svg-margin-end: 0px;--toast-button-margin-start: auto;--toast-button-margin-end: 0;--toast-close-button-start: 0;--toast-close-button-end: unset;--toast-close-button-transform: translate(-35%, -35%)}:where(html[dir="rtl"]),:where([data-sonner-toaster][dir="rtl"]){--toast-icon-margin-start: 4px;--toast-icon-margin-end: -3px;--toast-svg-margin-start: 0px;--toast-svg-margin-end: -1px;--toast-button-margin-start: 0;--toast-button-margin-end: auto;--toast-close-button-start: unset;--toast-close-button-end: 0;--toast-close-button-transform: translate(35%, -35%)}:where([data-sonner-toaster]){position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1: hsl(0, 0%, 99%);--gray2: hsl(0, 0%, 97.3%);--gray3: hsl(0, 0%, 95.1%);--gray4: hsl(0, 0%, 93%);--gray5: hsl(0, 0%, 90.9%);--gray6: hsl(0, 0%, 88.7%);--gray7: hsl(0, 0%, 85.8%);--gray8: hsl(0, 0%, 78%);--gray9: hsl(0, 0%, 56.1%);--gray10: hsl(0, 0%, 52.3%);--gray11: hsl(0, 0%, 43.5%);--gray12: hsl(0, 0%, 9%);--border-radius: 8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:none;z-index:999999999}:where([data-sonner-toaster][data-x-position="right"]){right:max(var(--offset),env(safe-area-inset-right))}:where([data-sonner-toaster][data-x-position="left"]){left:max(var(--offset),env(safe-area-inset-left))}:where([data-sonner-toaster][data-x-position="center"]){left:50%;transform:translate(-50%)}:where([data-sonner-toaster][data-y-position="top"]){top:max(var(--offset),env(safe-area-inset-top))}:where([data-sonner-toaster][data-y-position="bottom"]){bottom:max(var(--offset),env(safe-area-inset-bottom))}:where([data-sonner-toast]){--y: translateY(100%);--lift-amount: calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);filter:blur(0);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:none;overflow-wrap:anywhere}:where([data-sonner-toast][data-styled="true"]){padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px #0000001a;width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}:where([data-sonner-toast]:focus-visible){box-shadow:0 4px 12px #0000001a,0 0 0 2px #0003}:where([data-sonner-toast][data-y-position="top"]){top:0;--y: translateY(-100%);--lift: 1;--lift-amount: calc(1 * var(--gap))}:where([data-sonner-toast][data-y-position="bottom"]){bottom:0;--y: translateY(100%);--lift: -1;--lift-amount: calc(var(--lift) * var(--gap))}:where([data-sonner-toast]) :where([data-description]){font-weight:400;line-height:1.4;color:inherit}:where([data-sonner-toast]) :where([data-title]){font-weight:500;line-height:1.5;color:inherit}:where([data-sonner-toast]) :where([data-icon]){display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}:where([data-sonner-toast][data-promise="true"]) :where([data-icon])>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}:where([data-sonner-toast]) :where([data-icon])>*{flex-shrink:0}:where([data-sonner-toast]) :where([data-icon]) svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}:where([data-sonner-toast]) :where([data-content]){display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;cursor:pointer;outline:none;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}:where([data-sonner-toast]) :where([data-button]):focus-visible{box-shadow:0 0 0 2px #0006}:where([data-sonner-toast]) :where([data-button]):first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}:where([data-sonner-toast]) :where([data-cancel]){color:var(--normal-text);background:rgba(0,0,0,.08)}:where([data-sonner-toast][data-theme="dark"]) :where([data-cancel]){background:rgba(255,255,255,.3)}:where([data-sonner-toast]) :where([data-close-button]){position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;background:var(--gray1);color:var(--gray12);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}:where([data-sonner-toast]) :where([data-close-button]):focus-visible{box-shadow:0 4px 12px #0000001a,0 0 0 2px #0003}:where([data-sonner-toast]) :where([data-disabled="true"]){cursor:not-allowed}:where([data-sonner-toast]):hover :where([data-close-button]):hover{background:var(--gray2);border-color:var(--gray5)}:where([data-sonner-toast][data-swiping="true"]):before{content:"";position:absolute;left:0;right:0;height:100%;z-index:-1}:where([data-sonner-toast][data-y-position="top"][data-swiping="true"]):before{bottom:50%;transform:scaleY(3) translateY(50%)}:where([data-sonner-toast][data-y-position="bottom"][data-swiping="true"]):before{top:50%;transform:scaleY(3) translateY(-50%)}:where([data-sonner-toast][data-swiping="false"][data-removed="true"]):before{content:"";position:absolute;inset:0;transform:scaleY(2)}:where([data-sonner-toast]):after{content:"";position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}:where([data-sonner-toast][data-mounted="true"]){--y: translateY(0);opacity:1}:where([data-sonner-toast][data-expanded="false"][data-front="false"]){--scale: var(--toasts-before) * .05 + 1;--y: translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}:where([data-sonner-toast])>*{transition:opacity .4s}:where([data-sonner-toast][data-expanded="false"][data-front="false"][data-styled="true"])>*{opacity:0}:where([data-sonner-toast][data-visible="false"]){opacity:0;pointer-events:none}:where([data-sonner-toast][data-mounted="true"][data-expanded="true"]){--y: translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}:where([data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"]){--y: translateY(calc(var(--lift) * -100%));opacity:0}:where([data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"]){--y: translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}:where([data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"]){--y: translateY(40%);opacity:0;transition:transform .5s,opacity .2s}:where([data-sonner-toast][data-removed="true"][data-front="false"]):before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount, 0px));transition:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation:swipe-out .2s ease-out forwards}@keyframes swipe-out{0%{transform:translateY(calc(var(--lift) * var(--offset) + var(--swipe-amount)));opacity:1}to{transform:translateY(calc(var(--lift) * var(--offset) + var(--swipe-amount) + var(--lift) * -100%));opacity:0}}@media (max-width: 600px){[data-sonner-toaster]{position:fixed;--mobile-offset: 16px;right:var(--mobile-offset);left:var(--mobile-offset);width:100%}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset)}[data-sonner-toaster][data-y-position=bottom]{bottom:20px}[data-sonner-toaster][data-y-position=top]{top:20px}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset);right:var(--mobile-offset);transform:none}}[data-sonner-toaster][data-theme=light]{--normal-bg: #fff;--normal-border: var(--gray4);--normal-text: var(--gray12);--success-bg: hsl(143, 85%, 96%);--success-border: hsl(145, 92%, 91%);--success-text: hsl(140, 100%, 27%);--info-bg: hsl(208, 100%, 97%);--info-border: hsl(221, 91%, 91%);--info-text: hsl(210, 92%, 45%);--warning-bg: hsl(49, 100%, 97%);--warning-border: hsl(49, 91%, 91%);--warning-text: hsl(31, 92%, 45%);--error-bg: hsl(359, 100%, 97%);--error-border: hsl(359, 100%, 94%);--error-text: hsl(360, 100%, 45%)}[data-sonner-toaster][data-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg: #000;--normal-border: hsl(0, 0%, 20%);--normal-text: var(--gray1)}[data-sonner-toaster][data-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg: #fff;--normal-border: var(--gray3);--normal-text: var(--gray12)}[data-sonner-toaster][data-theme=dark]{--normal-bg: #000;--normal-border: hsl(0, 0%, 20%);--normal-text: var(--gray1);--success-bg: hsl(150, 100%, 6%);--success-border: hsl(147, 100%, 12%);--success-text: hsl(150, 86%, 65%);--info-bg: hsl(215, 100%, 6%);--info-border: hsl(223, 100%, 12%);--info-text: hsl(216, 87%, 65%);--warning-bg: hsl(64, 100%, 6%);--warning-border: hsl(60, 100%, 12%);--warning-text: hsl(46, 87%, 65%);--error-bg: hsl(358, 76%, 10%);--error-border: hsl(357, 89%, 16%);--error-text: hsl(358, 100%, 81%)}[data-rich-colors=true][data-sonner-toast][data-type=success],[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info],[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning],[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error],[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size: 16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:nth-child(1){animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}to{opacity:.15}}@media (prefers-reduced-motion){[data-sonner-toast],[data-sonner-toast]>*,.sonner-loading-bar{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}
 </style></head>
@@ -529,10 +560,9 @@ body.admin-on #admin-save-bar{display:flex;}
           <textarea class="ap-textarea" id="ap-desc" rows="2" placeholder="Brief description of this building and what's in it…"></textarea>
         </div>
         <div class="ap-field">
-          <label class="ap-label">Rooms / Spaces (one per line, e.g. A — Admissions)</label>
-          <textarea class="ap-textarea" id="ap-rooms" rows="3" placeholder="A — Admissions
-B — Bookstore
-C — Financial Aid"></textarea>
+          <label class="ap-label">Spaces &amp; Rooms</label>
+          <div id="ap-rooms-list"></div>
+          <button type="button" class="ap-add-room-btn" onclick="addAdminRoom()">+ Add Space / Room</button>
         </div>
         <div class="ap-field">
           <label class="ap-label">Photos</label>
@@ -580,11 +610,11 @@ const BLDGS = [
     "lat": 39.34641054055041,
     "lng": -101.70035971031189,
     "rooms": [
-      "A — Admissions",
-      "B — Bookstore",
-      "C — Business / Financial Aid Office",
-      "D — Testing Center",
-      "E — Automotive Technology"
+      {"name":"A — Admissions","photos":[],"link":""},
+      {"name":"B — Bookstore","photos":[],"link":""},
+      {"name":"C — Business / Financial Aid Office","photos":[],"link":""},
+      {"name":"D — Testing Center","photos":[],"link":""},
+      {"name":"E — Automotive Technology","photos":[],"link":""}
     ],
     "desc": "The main administrative hub of campus. Houses admissions, bookstore, financial aid, testing center, and automotive technology."
   },
@@ -604,9 +634,9 @@ const BLDGS = [
     "lat": 39.34538561595531,
     "lng": -101.69874916267395,
     "rooms": [
-      "A — Respiratory Care",
-      "B — Medical Assistant",
-      "C — Crime Scene Investigation"
+      {"name":"A — Respiratory Care","photos":[],"link":""},
+      {"name":"B — Medical Assistant","photos":[],"link":""},
+      {"name":"C — Crime Scene Investigation","photos":[],"link":""}
     ],
     "desc": "Houses Respiratory Care, Medical Assistant, and Crime Scene Investigation programs."
   },
@@ -644,10 +674,10 @@ const BLDGS = [
     "lat": 39.34501224909033,
     "lng": -101.69923014945984,
     "rooms": [
-      "A — Assembly Room",
-      "B — Cafeteria",
-      "C — Lyons Room",
-      "D — \"The Tiger's Den\" Deli"
+      {"name":"A — Assembly Room","photos":[],"link":""},
+      {"name":"B — Cafeteria","photos":[],"link":""},
+      {"name":"C — Lyons Room","photos":[],"link":""},
+      {"name":"D — \"The Tiger's Den\" Deli","photos":[],"link":""}
     ],
     "desc": "The heart of campus life — cafeteria, assembly room, Lyons Room, and The Tiger's Den Deli."
   },
@@ -667,8 +697,8 @@ const BLDGS = [
     "lat": 39.34539174583229,
     "lng": -101.69968076057434,
     "rooms": [
-      "A — Plumbing",
-      "B — Construction Technology"
+      {"name":"A — Plumbing","photos":[],"link":""},
+      {"name":"B — Construction Technology","photos":[],"link":""}
     ],
     "desc": "Houses Plumbing and Construction Technology programs with hands-on lab and shop space."
   },
@@ -697,8 +727,8 @@ const BLDGS = [
     "lat": 39.34488471171877,
     "lng": -101.69773884124756,
     "rooms": [
-      "A — Civil Engineering Technology",
-      "B — Mechanical Engineering Technology"
+      {"name":"A — Civil Engineering Technology","photos":[],"link":""},
+      {"name":"B — Mechanical Engineering Technology","photos":[],"link":""}
     ],
     "desc": "Houses Civil Engineering Technology and Mechanical Engineering Technology programs."
   },
@@ -718,9 +748,9 @@ const BLDGS = [
     "lat": 39.34433142086515,
     "lng": -101.69774350395203,
     "rooms": [
-      "A — Computer Graphics Technology",
-      "B — Business Technology",
-      "C — Child Care Specialist"
+      {"name":"A — Computer Graphics Technology","photos":[],"link":""},
+      {"name":"B — Business Technology","photos":[],"link":""},
+      {"name":"C — Child Care Specialist","photos":[],"link":""}
     ],
     "desc": "Houses Computer Graphics Technology, Business Technology, and Child Care Specialist programs."
   },
@@ -731,7 +761,7 @@ const BLDGS = [
     "lat": 39.34552227799962,
     "lng": -101.69692829360962,
     "rooms": [
-      "A — Diesel Technology"
+      {"name":"A — Diesel Technology","photos":[],"link":""}
     ],
     "desc": "Home of the Diesel Technology program — a premier diesel mechanic training facility."
   },
@@ -809,6 +839,19 @@ const BLDGS = [
   }
 ];
 // __BLDGS_DATA_END__
+
+// ─────────────────────────────────────────
+// ROOM HELPERS — rooms are now objects {name,photos,link}
+// ─────────────────────────────────────────
+function normalizeRoom(r){
+  if(typeof r==='string') return{name:r,photos:[],link:''};
+  return{name:r.name||'',photos:Array.isArray(r.photos)?r.photos:[],link:r.link||''};
+}
+function normalizeRooms(arr){return(arr||[]).map(normalizeRoom);}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Normalize rooms in BLDGS array at load time
+BLDGS.forEach(b=>{b.rooms=normalizeRooms(b.rooms);});
 
 // Clear any stale localStorage building data — Google Sheets is now the source of truth
 try{localStorage.removeItem('fhnw_bldgs');}catch(e){}
@@ -1074,8 +1117,8 @@ function selectBuilding(id){
   document.getElementById('pop-cat').textContent=CAT_LABEL[b.cat];
   document.getElementById('pop-desc').textContent=b.desc;
   buildSlider(b.photos||[]);
-  const rEl=document.getElementById('pop-rooms');
-  rEl.innerHTML=b.rooms.length?`<div class="pop-rl">Spaces &amp; Programs</div>${b.rooms.map(r=>`<div class="pop-room">${r}</div>`).join('')}`:'';
+  popRoomStates={};
+  buildPopupRooms(b,document.getElementById('pop-rooms'));
   popup.style.display='block';
   repositionPopup();
 }
@@ -1186,6 +1229,90 @@ function handlePhotoUpload(input){
   input.value='';
 }
 
+// ─────────────────────────────────────────
+// ADMIN ROOM EDITOR
+// ─────────────────────────────────────────
+let _adminRooms=[]; // working rooms while editing
+
+function collectAdminRoomValues(){
+  document.querySelectorAll('#ap-rooms-list .ap-room-item').forEach((el,i)=>{
+    if(i>=_adminRooms.length) return;
+    const n=el.querySelector('.apr-name'); if(n) _adminRooms[i].name=n.value;
+    const l=el.querySelector('.apr-link'); if(l) _adminRooms[i].link=l.value;
+  });
+}
+
+function renderAdminRooms(){
+  const c=document.getElementById('ap-rooms-list'); if(!c) return;
+  c.innerHTML='';
+  _adminRooms.forEach((room,i)=>{
+    const div=document.createElement('div'); div.className='ap-room-item';
+    div.innerHTML=`
+      <div class="ap-room-header">
+        <span class="ap-room-num">${i+1}</span>
+        <input class="ap-input apr-name" type="text" value="${escHtml(room.name)}" placeholder="Space / Room name…" style="flex:1;margin:0;">
+        <button class="ap-room-del" onclick="delAdminRoom(${i})" title="Remove">×</button>
+      </div>
+      <div class="ap-room-details">
+        <div style="margin-bottom:6px">
+          <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">Program Link (optional)</label>
+          <input class="ap-input apr-link" type="url" value="${escHtml(room.link||'')}" placeholder="https://fhnw.edu/programs/…">
+        </div>
+        <div>
+          <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">Photos</label>
+          <div class="ap-room-photo-row">
+            <input class="ap-input" id="rpu-${i}" type="url" placeholder="Paste Google Drive URL…" style="flex:1;margin:0;">
+            <button class="ap-btn ap-save" style="padding:6px 10px;white-space:nowrap" onclick="addRoomPhotoUrl(${i})">Add</button>
+          </div>
+          <div id="rpt-${i}" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${renderRoomThumbsHtml(i)}</div>
+        </div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function renderRoomThumbsHtml(i){
+  return (_adminRooms[i]?.photos||[]).map((p,pi)=>`
+    <div class="ap-thumb-wrap">
+      <img src="${escHtml(p)}" alt="">
+      <div class="ap-thumb-ctrl">
+        <button class="ap-thumb-del" onclick="removeRoomPhoto(${i},${pi})" title="Remove">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function refreshRoomThumbs(i){
+  const c=document.getElementById('rpt-'+i); if(c) c.innerHTML=renderRoomThumbsHtml(i);
+}
+
+function addAdminRoom(){
+  collectAdminRoomValues();
+  _adminRooms.push({name:'',link:'',photos:[]});
+  renderAdminRooms();
+  document.getElementById('ap-rooms-list')?.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function delAdminRoom(i){
+  collectAdminRoomValues();
+  _adminRooms.splice(i,1);
+  renderAdminRooms();
+}
+
+function addRoomPhotoUrl(i){
+  collectAdminRoomValues();
+  const inp=document.getElementById('rpu-'+i); if(!inp) return;
+  const raw=inp.value.trim(); if(!raw) return;
+  _adminRooms[i].photos.push(convertDriveUrl(raw));
+  inp.value='';
+  refreshRoomThumbs(i);
+}
+
+function removeRoomPhoto(i,pi){
+  collectAdminRoomValues();
+  _adminRooms[i].photos.splice(pi,1);
+  refreshRoomThumbs(i);
+}
+
 let sliderIdx=0,sliderPhotos=[];
 function buildSlider(photos){
   sliderPhotos=photos; sliderIdx=0;
@@ -1208,6 +1335,66 @@ function sliderGoto(i){
   document.querySelectorAll('.pop-slider-dot').forEach((d,j)=>d.classList.toggle('active',j===sliderIdx));
 }
 function sliderStep(dir){sliderGoto((sliderIdx+dir+sliderPhotos.length)%sliderPhotos.length);}
+
+// ─────────────────────────────────────────
+// POPUP ROOM CARDS
+// ─────────────────────────────────────────
+let popRoomStates={}; // {roomIdx: photoIdx}
+
+function buildPopupRooms(b,container){
+  const rooms=normalizeRooms(b.rooms);
+  if(!rooms.length){container.innerHTML='';return;}
+  let html='<div class="pop-rl">Spaces &amp; Programs</div>';
+  rooms.forEach((r,i)=>{
+    const hasPhotos=r.photos&&r.photos.length>0;
+    const hasLink=!!r.link;
+    const expandable=hasPhotos||hasLink;
+    const badges=(hasPhotos?'📷 ':'')+( hasLink?'🔗':'');
+    html+=`<div class="pop-room${expandable?' pop-room-x':''}" data-ri="${i}" onclick="togglePopupRoom(this,${i})">
+      <div class="pop-room-head">
+        ${expandable?`<span class="pop-room-arrow">▶</span>`:`<span class="pop-room-dot"></span>`}
+        <span class="pop-room-name">${escHtml(r.name)}</span>
+        ${badges?`<span class="pop-room-badges">${badges}</span>`:''}
+      </div>
+      <div class="pop-room-body">
+        ${hasPhotos?buildRoomMiniSlider(r.photos,i):''}
+        ${hasLink?`<a class="pop-room-link" href="${escHtml(r.link)}" target="_blank" onclick="event.stopPropagation()">Visit Program Page →</a>`:''}
+      </div>
+    </div>`;
+  });
+  container.innerHTML=html;
+}
+
+function buildRoomMiniSlider(photos,ri){
+  const first=photos[0]||'';
+  const multi=photos.length>1;
+  return `<div class="pop-room-mini-wrap" id="rmw-${ri}">
+    <img id="rmi-${ri}" src="${escHtml(first)}" alt="" onerror="this.style.display='none'">
+    ${multi?`<div class="pop-room-mini-nav">
+      <button class="pop-room-mini-btn" onclick="event.stopPropagation();roomSlide(${ri},-1)">&#8249;</button>
+      <button class="pop-room-mini-btn" onclick="event.stopPropagation();roomSlide(${ri},1)">&#8250;</button>
+    </div>
+    <div class="pop-room-mini-count" id="rmc-${ri}">1/${photos.length}</div>`:''}
+  </div>`;
+}
+
+function togglePopupRoom(el,ri){
+  if(!el.classList.contains('pop-room-x')) return;
+  el.classList.toggle('open');
+}
+
+function roomSlide(ri,dir){
+  const b=BLDGS.find(x=>x.id===selId); if(!b) return;
+  const room=normalizeRooms(b.rooms)[ri]; if(!room) return;
+  const photos=room.photos||[]; if(!photos.length) return;
+  if(popRoomStates[ri]==null) popRoomStates[ri]=0;
+  popRoomStates[ri]=(popRoomStates[ri]+dir+photos.length)%photos.length;
+  const img=document.getElementById('rmi-'+ri);
+  const cnt=document.getElementById('rmc-'+ri);
+  if(img) img.src=photos[popRoomStates[ri]];
+  if(cnt) cnt.textContent=(popRoomStates[ri]+1)+'/'+photos.length;
+}
+
 function repositionPopup(){
   const b=BLDGS.find(x=>x.id===selId); if(!b||popup.style.display==='none') return;
   const W=outer.clientWidth,H=outer.clientHeight;
@@ -1223,7 +1410,7 @@ function repositionPopup(){
 }
 
 function closePopup(){
-  selId=null; popup.style.display='none';
+  selId=null; popup.style.display='none'; popRoomStates={};
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('sel'));
   render();
 }
@@ -1297,7 +1484,7 @@ function handleMapClick(e){
   cancelAddMode();
   // Create temp building
   const newId=Math.max(0,...BLDGS.map(b=>b.id))+1;
-  const newB={id:newId,name:'New Building '+newId,cat:'prog',lat:pos.lat,lng:pos.lng,rooms:[],desc:''};
+  const newB={id:newId,name:'New Building '+newId,cat:'prog',lat:pos.lat,lng:pos.lng,rooms:[],photos:[],desc:''};
   BLDGS.push(newB);
   buildSidebar();
   render();
@@ -1316,7 +1503,8 @@ function openAdminPanel(id,isNew=false){
   document.getElementById('ap-name').value=b.name;
   document.getElementById('ap-cat').value=b.cat;
   document.getElementById('ap-desc').value=b.desc;
-  document.getElementById('ap-rooms').value=b.rooms.join('\n');
+  _adminRooms=normalizeRooms(b.rooms).map(r=>({...r,photos:[...r.photos]}));
+  renderAdminRooms();
   _adminPhotos=[...(b.photos||[])]; renderPhotoThumbs();
   const pu=document.getElementById('ap-photo-url'); if(pu) pu.value='';
   document.getElementById('ap-lat').textContent=b.lat.toFixed(6);
@@ -1361,7 +1549,8 @@ function saveBuilding(){
   b.name=document.getElementById('ap-name').value.trim()||'Unnamed Building';
   b.cat=document.getElementById('ap-cat').value;
   b.desc=document.getElementById('ap-desc').value.trim();
-  b.rooms=document.getElementById('ap-rooms').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  collectAdminRoomValues();
+  b.rooms=_adminRooms.map(r=>({...r,photos:[...r.photos]}));
   b.photos=[..._adminPhotos];
   persist();
   buildSidebar();
@@ -1516,7 +1705,7 @@ function loadFromSheets(url){
         return;
       }
       BLDGS.length=0;
-      data.forEach(b=>BLDGS.push(b));
+      data.forEach(b=>{b.rooms=normalizeRooms(b.rooms);BLDGS.push(b);});
       try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
       loadPhotos();
       buildSidebar(); render();
