@@ -1337,15 +1337,14 @@ function pushToSheets(showFeedback){
   const url=localStorage.getItem('fhnw_sheets_url');
   if(!url){if(showFeedback)sheetStatus('No Sheet connected yet','err');return;}
   if(showFeedback) sheetStatus('Saving…');
-  // Send as plain text to avoid CORS preflight
-  fetch(url,{method:'POST',body:JSON.stringify(BLDGS)})
-    .then(r=>r.text())
+  // no-cors avoids CORS preflight — response is opaque but data arrives fine
+  fetch(url,{method:'POST',body:JSON.stringify(BLDGS),mode:'no-cors'})
     .then(()=>{
       if(showFeedback) sheetStatus('Saved to Sheet ✓','ok');
       else showToast('Synced to Sheet ✓');
     })
     .catch(()=>{
-      if(showFeedback) sheetStatus('Save failed — check the URL','err');
+      if(showFeedback) sheetStatus('Save failed — check your internet connection','err');
       else showToast('Sheet sync failed');
     });
 }
