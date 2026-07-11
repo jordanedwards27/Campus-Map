@@ -18,14 +18,14 @@ html,body{height:100%;font-family:'Barlow','Segoe UI',Arial,sans-serif;overflow:
 /* ── Header ── */
 header{
   background:var(--black);color:white;
-  padding:9px 18px;display:flex;align-items:center;gap:14px;
+  padding:13px 22px;display:flex;align-items:center;gap:14px;
   border-bottom:3px solid var(--gold);flex-shrink:0;position:relative;z-index:999;
   transition:border-color .3s;
 }
 body.admin-on header{border-bottom-color:var(--admin-red);}
-.header-logo{height:36px;width:auto;display:block;object-fit:contain;}
-.hdr-div{width:2px;height:34px;background:var(--accent);margin:0 6px;border-radius:2px;}
-.hdr-tag{font-size:13px;color:#ccc;font-weight:600;letter-spacing:.3px;}
+.header-logo{height:48px;width:auto;display:block;object-fit:contain;}
+.hdr-div{width:2px;height:44px;background:var(--accent);margin:0 6px;border-radius:2px;}
+.hdr-tag{font-size:14px;color:#ccc;font-weight:600;letter-spacing:.3px;}
 .hdr-right{margin-left:auto;font-size:11px;color:#aaa;text-align:right;line-height:1.7;}
 .hdr-right a{color:var(--gold);text-decoration:none;}
 .admin-badge{
@@ -37,7 +37,7 @@ body.admin-on .admin-badge{display:block;}
 
 
 /* ── Shell ── */
-.shell{display:flex;height:calc(100vh - 50px);}
+.shell{display:flex;height:calc(100vh - 68px);}
 
 /* ── Sidebar ── */
 .sidebar{
@@ -265,11 +265,11 @@ body.admin-on #admin-save-bar{display:flex;}
 /* ── Mobile styles ── */
 @media(max-width:640px){
   /* Header */
-  header{padding:7px 10px;gap:8px;}
-  .header-logo{height:26px;}
+  header{padding:9px 12px;gap:8px;}
+  .header-logo{height:36px;}
   .hdr-div,.hdr-right{display:none;}
-  .hdr-tag{font-size:10.5px;}
-  .shell{height:calc(100vh - 44px);}
+  .hdr-tag{font-size:11px;}
+  .shell{height:calc(100vh - 56px);}
   #mob-menu-btn{display:block;}
 
   /* Sidebar → slide-out drawer */
