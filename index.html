@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fort Hays Tech | Northwest — Campus Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
 <style>
 :root{
   --black:#1a1a1a;--gold:#fbbe00;--gold-d:#d4a700;
@@ -108,6 +106,16 @@ body.admin-on .bm.dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,0.5);z-i
 .pop-cat{font-size:9.5px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
 .pop-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;line-height:1;padding:0;flex-shrink:0;}
 .pop-close:hover{color:white;}
+.pop-slider{position:relative;width:100%;height:160px;overflow:hidden;display:none;background:#111;}
+.pop-slider-track{display:flex;height:100%;transition:transform .3s ease;}
+.pop-slider img{width:100%;height:160px;object-fit:cover;flex-shrink:0;}
+.pop-slider-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);color:#fff;border:none;font-size:18px;padding:0 10px;height:36px;cursor:pointer;z-index:2;line-height:36px;}
+.pop-slider-btn:hover{background:rgba(0,0,0,.7);}
+.pop-slider-prev{left:0;border-radius:0 4px 4px 0;}
+.pop-slider-next{right:0;border-radius:4px 0 0 4px;}
+.pop-slider-dots{position:absolute;bottom:5px;left:0;right:0;text-align:center;}
+.pop-slider-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);margin:0 3px;cursor:pointer;}
+.pop-slider-dot.active{background:#fff;}
 .pop-body{padding:11px 14px;}
 .pop-desc{font-size:11.5px;color:#555;line-height:1.65;margin-bottom:8px;}
 .pop-rl{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);font-weight:700;margin-bottom:5px;}
@@ -226,8 +234,9 @@ body.admin-on #admin-save-bar{display:flex;}
   box-shadow:0 2px 10px rgba(0,0,0,.3);
 }
 </style>
-</head>
-<body>
+<style type="text/css">:where(html[dir="ltr"]),:where([data-sonner-toaster][dir="ltr"]){--toast-icon-margin-start: -3px;--toast-icon-margin-end: 4px;--toast-svg-margin-start: -1px;--toast-svg-margin-end: 0px;--toast-button-margin-start: auto;--toast-button-margin-end: 0;--toast-close-button-start: 0;--toast-close-button-end: unset;--toast-close-button-transform: translate(-35%, -35%)}:where(html[dir="rtl"]),:where([data-sonner-toaster][dir="rtl"]){--toast-icon-margin-start: 4px;--toast-icon-margin-end: -3px;--toast-svg-margin-start: 0px;--toast-svg-margin-end: -1px;--toast-button-margin-start: 0;--toast-button-margin-end: auto;--toast-close-button-start: unset;--toast-close-button-end: 0;--toast-close-button-transform: translate(35%, -35%)}:where([data-sonner-toaster]){position:fixed;width:var(--width);font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;--gray1: hsl(0, 0%, 99%);--gray2: hsl(0, 0%, 97.3%);--gray3: hsl(0, 0%, 95.1%);--gray4: hsl(0, 0%, 93%);--gray5: hsl(0, 0%, 90.9%);--gray6: hsl(0, 0%, 88.7%);--gray7: hsl(0, 0%, 85.8%);--gray8: hsl(0, 0%, 78%);--gray9: hsl(0, 0%, 56.1%);--gray10: hsl(0, 0%, 52.3%);--gray11: hsl(0, 0%, 43.5%);--gray12: hsl(0, 0%, 9%);--border-radius: 8px;box-sizing:border-box;padding:0;margin:0;list-style:none;outline:none;z-index:999999999}:where([data-sonner-toaster][data-x-position="right"]){right:max(var(--offset),env(safe-area-inset-right))}:where([data-sonner-toaster][data-x-position="left"]){left:max(var(--offset),env(safe-area-inset-left))}:where([data-sonner-toaster][data-x-position="center"]){left:50%;transform:translate(-50%)}:where([data-sonner-toaster][data-y-position="top"]){top:max(var(--offset),env(safe-area-inset-top))}:where([data-sonner-toaster][data-y-position="bottom"]){bottom:max(var(--offset),env(safe-area-inset-bottom))}:where([data-sonner-toast]){--y: translateY(100%);--lift-amount: calc(var(--lift) * var(--gap));z-index:var(--z-index);position:absolute;opacity:0;transform:var(--y);filter:blur(0);touch-action:none;transition:transform .4s,opacity .4s,height .4s,box-shadow .2s;box-sizing:border-box;outline:none;overflow-wrap:anywhere}:where([data-sonner-toast][data-styled="true"]){padding:16px;background:var(--normal-bg);border:1px solid var(--normal-border);color:var(--normal-text);border-radius:var(--border-radius);box-shadow:0 4px 12px #0000001a;width:var(--width);font-size:13px;display:flex;align-items:center;gap:6px}:where([data-sonner-toast]:focus-visible){box-shadow:0 4px 12px #0000001a,0 0 0 2px #0003}:where([data-sonner-toast][data-y-position="top"]){top:0;--y: translateY(-100%);--lift: 1;--lift-amount: calc(1 * var(--gap))}:where([data-sonner-toast][data-y-position="bottom"]){bottom:0;--y: translateY(100%);--lift: -1;--lift-amount: calc(var(--lift) * var(--gap))}:where([data-sonner-toast]) :where([data-description]){font-weight:400;line-height:1.4;color:inherit}:where([data-sonner-toast]) :where([data-title]){font-weight:500;line-height:1.5;color:inherit}:where([data-sonner-toast]) :where([data-icon]){display:flex;height:16px;width:16px;position:relative;justify-content:flex-start;align-items:center;flex-shrink:0;margin-left:var(--toast-icon-margin-start);margin-right:var(--toast-icon-margin-end)}:where([data-sonner-toast][data-promise="true"]) :where([data-icon])>svg{opacity:0;transform:scale(.8);transform-origin:center;animation:sonner-fade-in .3s ease forwards}:where([data-sonner-toast]) :where([data-icon])>*{flex-shrink:0}:where([data-sonner-toast]) :where([data-icon]) svg{margin-left:var(--toast-svg-margin-start);margin-right:var(--toast-svg-margin-end)}:where([data-sonner-toast]) :where([data-content]){display:flex;flex-direction:column;gap:2px}[data-sonner-toast][data-styled=true] [data-button]{border-radius:4px;padding-left:8px;padding-right:8px;height:24px;font-size:12px;color:var(--normal-bg);background:var(--normal-text);margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end);border:none;cursor:pointer;outline:none;display:flex;align-items:center;flex-shrink:0;transition:opacity .4s,box-shadow .2s}:where([data-sonner-toast]) :where([data-button]):focus-visible{box-shadow:0 0 0 2px #0006}:where([data-sonner-toast]) :where([data-button]):first-of-type{margin-left:var(--toast-button-margin-start);margin-right:var(--toast-button-margin-end)}:where([data-sonner-toast]) :where([data-cancel]){color:var(--normal-text);background:rgba(0,0,0,.08)}:where([data-sonner-toast][data-theme="dark"]) :where([data-cancel]){background:rgba(255,255,255,.3)}:where([data-sonner-toast]) :where([data-close-button]){position:absolute;left:var(--toast-close-button-start);right:var(--toast-close-button-end);top:0;height:20px;width:20px;display:flex;justify-content:center;align-items:center;padding:0;background:var(--gray1);color:var(--gray12);border:1px solid var(--gray4);transform:var(--toast-close-button-transform);border-radius:50%;cursor:pointer;z-index:1;transition:opacity .1s,background .2s,border-color .2s}:where([data-sonner-toast]) :where([data-close-button]):focus-visible{box-shadow:0 4px 12px #0000001a,0 0 0 2px #0003}:where([data-sonner-toast]) :where([data-disabled="true"]){cursor:not-allowed}:where([data-sonner-toast]):hover :where([data-close-button]):hover{background:var(--gray2);border-color:var(--gray5)}:where([data-sonner-toast][data-swiping="true"]):before{content:"";position:absolute;left:0;right:0;height:100%;z-index:-1}:where([data-sonner-toast][data-y-position="top"][data-swiping="true"]):before{bottom:50%;transform:scaleY(3) translateY(50%)}:where([data-sonner-toast][data-y-position="bottom"][data-swiping="true"]):before{top:50%;transform:scaleY(3) translateY(-50%)}:where([data-sonner-toast][data-swiping="false"][data-removed="true"]):before{content:"";position:absolute;inset:0;transform:scaleY(2)}:where([data-sonner-toast]):after{content:"";position:absolute;left:0;height:calc(var(--gap) + 1px);bottom:100%;width:100%}:where([data-sonner-toast][data-mounted="true"]){--y: translateY(0);opacity:1}:where([data-sonner-toast][data-expanded="false"][data-front="false"]){--scale: var(--toasts-before) * .05 + 1;--y: translateY(calc(var(--lift-amount) * var(--toasts-before))) scale(calc(-1 * var(--scale)));height:var(--front-toast-height)}:where([data-sonner-toast])>*{transition:opacity .4s}:where([data-sonner-toast][data-expanded="false"][data-front="false"][data-styled="true"])>*{opacity:0}:where([data-sonner-toast][data-visible="false"]){opacity:0;pointer-events:none}:where([data-sonner-toast][data-mounted="true"][data-expanded="true"]){--y: translateY(calc(var(--lift) * var(--offset)));height:var(--initial-height)}:where([data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"]){--y: translateY(calc(var(--lift) * -100%));opacity:0}:where([data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="true"]){--y: translateY(calc(var(--lift) * var(--offset) + var(--lift) * -100%));opacity:0}:where([data-sonner-toast][data-removed="true"][data-front="false"][data-swipe-out="false"][data-expanded="false"]){--y: translateY(40%);opacity:0;transition:transform .5s,opacity .2s}:where([data-sonner-toast][data-removed="true"][data-front="false"]):before{height:calc(var(--initial-height) + 20%)}[data-sonner-toast][data-swiping=true]{transform:var(--y) translateY(var(--swipe-amount, 0px));transition:none}[data-sonner-toast][data-swipe-out=true][data-y-position=bottom],[data-sonner-toast][data-swipe-out=true][data-y-position=top]{animation:swipe-out .2s ease-out forwards}@keyframes swipe-out{0%{transform:translateY(calc(var(--lift) * var(--offset) + var(--swipe-amount)));opacity:1}to{transform:translateY(calc(var(--lift) * var(--offset) + var(--swipe-amount) + var(--lift) * -100%));opacity:0}}@media (max-width: 600px){[data-sonner-toaster]{position:fixed;--mobile-offset: 16px;right:var(--mobile-offset);left:var(--mobile-offset);width:100%}[data-sonner-toaster] [data-sonner-toast]{left:0;right:0;width:calc(100% - var(--mobile-offset) * 2)}[data-sonner-toaster][data-x-position=left]{left:var(--mobile-offset)}[data-sonner-toaster][data-y-position=bottom]{bottom:20px}[data-sonner-toaster][data-y-position=top]{top:20px}[data-sonner-toaster][data-x-position=center]{left:var(--mobile-offset);right:var(--mobile-offset);transform:none}}[data-sonner-toaster][data-theme=light]{--normal-bg: #fff;--normal-border: var(--gray4);--normal-text: var(--gray12);--success-bg: hsl(143, 85%, 96%);--success-border: hsl(145, 92%, 91%);--success-text: hsl(140, 100%, 27%);--info-bg: hsl(208, 100%, 97%);--info-border: hsl(221, 91%, 91%);--info-text: hsl(210, 92%, 45%);--warning-bg: hsl(49, 100%, 97%);--warning-border: hsl(49, 91%, 91%);--warning-text: hsl(31, 92%, 45%);--error-bg: hsl(359, 100%, 97%);--error-border: hsl(359, 100%, 94%);--error-text: hsl(360, 100%, 45%)}[data-sonner-toaster][data-theme=light] [data-sonner-toast][data-invert=true]{--normal-bg: #000;--normal-border: hsl(0, 0%, 20%);--normal-text: var(--gray1)}[data-sonner-toaster][data-theme=dark] [data-sonner-toast][data-invert=true]{--normal-bg: #fff;--normal-border: var(--gray3);--normal-text: var(--gray12)}[data-sonner-toaster][data-theme=dark]{--normal-bg: #000;--normal-border: hsl(0, 0%, 20%);--normal-text: var(--gray1);--success-bg: hsl(150, 100%, 6%);--success-border: hsl(147, 100%, 12%);--success-text: hsl(150, 86%, 65%);--info-bg: hsl(215, 100%, 6%);--info-border: hsl(223, 100%, 12%);--info-text: hsl(216, 87%, 65%);--warning-bg: hsl(64, 100%, 6%);--warning-border: hsl(60, 100%, 12%);--warning-text: hsl(46, 87%, 65%);--error-bg: hsl(358, 76%, 10%);--error-border: hsl(357, 89%, 16%);--error-text: hsl(358, 100%, 81%)}[data-rich-colors=true][data-sonner-toast][data-type=success],[data-rich-colors=true][data-sonner-toast][data-type=success] [data-close-button]{background:var(--success-bg);border-color:var(--success-border);color:var(--success-text)}[data-rich-colors=true][data-sonner-toast][data-type=info],[data-rich-colors=true][data-sonner-toast][data-type=info] [data-close-button]{background:var(--info-bg);border-color:var(--info-border);color:var(--info-text)}[data-rich-colors=true][data-sonner-toast][data-type=warning],[data-rich-colors=true][data-sonner-toast][data-type=warning] [data-close-button]{background:var(--warning-bg);border-color:var(--warning-border);color:var(--warning-text)}[data-rich-colors=true][data-sonner-toast][data-type=error],[data-rich-colors=true][data-sonner-toast][data-type=error] [data-close-button]{background:var(--error-bg);border-color:var(--error-border);color:var(--error-text)}.sonner-loading-wrapper{--size: 16px;height:var(--size);width:var(--size);position:absolute;inset:0;z-index:10}.sonner-loading-wrapper[data-visible=false]{transform-origin:center;animation:sonner-fade-out .2s ease forwards}.sonner-spinner{position:relative;top:50%;left:50%;height:var(--size);width:var(--size)}.sonner-loading-bar{animation:sonner-spin 1.2s linear infinite;background:var(--gray11);border-radius:6px;height:8%;left:-10%;position:absolute;top:-3.9%;width:24%}.sonner-loading-bar:nth-child(1){animation-delay:-1.2s;transform:rotate(.0001deg) translate(146%)}.sonner-loading-bar:nth-child(2){animation-delay:-1.1s;transform:rotate(30deg) translate(146%)}.sonner-loading-bar:nth-child(3){animation-delay:-1s;transform:rotate(60deg) translate(146%)}.sonner-loading-bar:nth-child(4){animation-delay:-.9s;transform:rotate(90deg) translate(146%)}.sonner-loading-bar:nth-child(5){animation-delay:-.8s;transform:rotate(120deg) translate(146%)}.sonner-loading-bar:nth-child(6){animation-delay:-.7s;transform:rotate(150deg) translate(146%)}.sonner-loading-bar:nth-child(7){animation-delay:-.6s;transform:rotate(180deg) translate(146%)}.sonner-loading-bar:nth-child(8){animation-delay:-.5s;transform:rotate(210deg) translate(146%)}.sonner-loading-bar:nth-child(9){animation-delay:-.4s;transform:rotate(240deg) translate(146%)}.sonner-loading-bar:nth-child(10){animation-delay:-.3s;transform:rotate(270deg) translate(146%)}.sonner-loading-bar:nth-child(11){animation-delay:-.2s;transform:rotate(300deg) translate(146%)}.sonner-loading-bar:nth-child(12){animation-delay:-.1s;transform:rotate(330deg) translate(146%)}@keyframes sonner-fade-in{0%{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}@keyframes sonner-fade-out{0%{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(.8)}}@keyframes sonner-spin{0%{opacity:1}to{opacity:.15}}@media (prefers-reduced-motion){[data-sonner-toast],[data-sonner-toast]>*,.sonner-loading-bar{transition:none!important;animation:none!important}}.sonner-loader{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:center;transition:opacity .2s,transform .2s}.sonner-loader[data-visible=false]{opacity:0;transform:scale(.8) translate(-50%,-50%)}
+</style></head>
+<body data-new-gr-c-s-check-loaded="14.1310.0" data-gr-ext-installed="" class="admin-on">
 
 <header>
   <img src="logo.png" alt="Fort Hays Tech | Northwest" class="header-logo">
@@ -246,7 +255,7 @@ body.admin-on #admin-save-bar{display:flex;}
   <div class="sidebar">
     <div class="sb-title">
       Buildings &amp; Facilities
-      <span class="sb-count" id="sb-count"></span>
+      <span class="sb-count" id="sb-count">23 buildings</span>
     </div>
     <div class="sb-search"><input type="text" id="search" placeholder="🔍  Search buildings…"></div>
     <div class="sb-filters">
@@ -257,13 +266,82 @@ body.admin-on #admin-save-bar{display:flex;}
       <button class="fb fb-ath" onclick="setFilter('ath')">Athletics</button>
       <button class="fb fb-svc" onclick="setFilter('svc')">Services</button>
     </div>
-    <div class="sb-list" id="sb-list"></div>
+    <div class="sb-list" id="sb-list"><div class="sbi" data-id="1" data-cat="admin">
+      <div class="sbi-num" style="background:#3a3a8b">1</div>
+      <div class="sbi-name">Sharp Administration Building</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(1)">✏️</button></div><div class="sbi" data-id="2" data-cat="svc">
+      <div class="sbi-num" style="background:#7a5a2a">2</div>
+      <div class="sbi-name">Maintenance Storage</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(2)">✏️</button></div><div class="sbi" data-id="3" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">3</div>
+      <div class="sbi-name">Medical Building</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(3)">✏️</button></div><div class="sbi" data-id="4" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">4</div>
+      <div class="sbi-name">Cosmetology</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(4)">✏️</button></div><div class="sbi" data-id="5" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">5</div>
+      <div class="sbi-name">Precision Agriculture Technology</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(5)">✏️</button></div><div class="sbi" data-id="6" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">6</div>
+      <div class="sbi-name">Welding Technology</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(6)">✏️</button></div><div class="sbi" data-id="7" data-cat="svc">
+      <div class="sbi-num" style="background:#7a5a2a">7</div>
+      <div class="sbi-name">Memorial Union</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(7)">✏️</button></div><div class="sbi" data-id="8" data-cat="svc">
+      <div class="sbi-num" style="background:#7a5a2a">8</div>
+      <div class="sbi-name">Max Alderman Library &amp; Resource Center</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(8)">✏️</button></div><div class="sbi" data-id="9" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">9</div>
+      <div class="sbi-name">Construction Building</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(9)">✏️</button></div><div class="sbi" data-id="10" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">10</div>
+      <div class="sbi-name">Building 10</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(10)">✏️</button></div><div class="sbi" data-id="11" data-cat="svc">
+      <div class="sbi-num" style="background:#7a5a2a">11</div>
+      <div class="sbi-name">Murray Center</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(11)">✏️</button></div><div class="sbi" data-id="12" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">12</div>
+      <div class="sbi-name">Engineering Building</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(12)">✏️</button></div><div class="sbi" data-id="13" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">13</div>
+      <div class="sbi-name">Electrical Technology</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(13)">✏️</button></div><div class="sbi" data-id="14" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">14</div>
+      <div class="sbi-name">Digital Technology Building</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(14)">✏️</button></div><div class="sbi" data-id="15" data-cat="prog">
+      <div class="sbi-num" style="background:#8B3A3A">15</div>
+      <div class="sbi-name">Kansas Institute of Diesel Technology</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(15)">✏️</button></div><div class="sbi" data-id="16" data-cat="housing">
+      <div class="sbi-num" style="background:#2e6e2e">16</div>
+      <div class="sbi-name">Laundry</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(16)">✏️</button></div><div class="sbi" data-id="17" data-cat="housing">
+      <div class="sbi-num" style="background:#2e6e2e">17</div>
+      <div class="sbi-name">Village I</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(17)">✏️</button></div><div class="sbi" data-id="18" data-cat="housing">
+      <div class="sbi-num" style="background:#2e6e2e">18</div>
+      <div class="sbi-name">Village II</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(18)">✏️</button></div><div class="sbi" data-id="19" data-cat="housing">
+      <div class="sbi-num" style="background:#2e6e2e">19</div>
+      <div class="sbi-name">Village III</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(19)">✏️</button></div><div class="sbi" data-id="20" data-cat="ath">
+      <div class="sbi-num" style="background:#5a3a7a">20</div>
+      <div class="sbi-name">Larry Keirns Fitness Center</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(20)">✏️</button></div><div class="sbi" data-id="21" data-cat="ath">
+      <div class="sbi-num" style="background:#5a3a7a">21</div>
+      <div class="sbi-name">Ed Mills Academic &amp; Athletic Center</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(21)">✏️</button></div><div class="sbi" data-id="22" data-cat="ath">
+      <div class="sbi-num" style="background:#5a3a7a">22</div>
+      <div class="sbi-name">Softball Fields</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(22)">✏️</button></div><div class="sbi" data-id="23" data-cat="svc">
+      <div class="sbi-num" style="background:#7a5a2a">23</div>
+      <div class="sbi-name">Price Convention Center</div>
+      <button class="sbi-edit" title="Edit" onclick="event.stopPropagation();openAdminPanel(23)">✏️</button></div></div>
   </div>
 
   <!-- Map -->
-  <div id="map-outer">
-    <div id="tile-layer"></div>
-    <div id="marker-layer"></div>
+  <div id="map-outer" class="">
+    <div id="tile-layer"><img id="t_17_28506_49930" draggable="false" src="https://b.tile.openstreetmap.org/17/28506/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: 90px;"><img id="t_17_28506_49931" draggable="false" src="https://c.tile.openstreetmap.org/17/28506/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: 346px;"><img id="t_17_28506_49932" draggable="false" src="https://a.tile.openstreetmap.org/17/28506/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: 602px;"><img id="t_17_28506_49933" draggable="false" src="https://b.tile.openstreetmap.org/17/28506/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: 858px;"><img id="t_17_28506_49934" draggable="false" src="https://c.tile.openstreetmap.org/17/28506/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: 1114px;"><img id="t_17_28507_49930" draggable="false" src="https://c.tile.openstreetmap.org/17/28507/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: 90px;"><img id="t_17_28507_49931" draggable="false" src="https://a.tile.openstreetmap.org/17/28507/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: 346px;"><img id="t_17_28507_49932" draggable="false" src="https://b.tile.openstreetmap.org/17/28507/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: 602px;"><img id="t_17_28507_49933" draggable="false" src="https://c.tile.openstreetmap.org/17/28507/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: 858px;"><img id="t_17_28507_49934" draggable="false" src="https://a.tile.openstreetmap.org/17/28507/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: 1114px;"><img id="t_17_28508_49930" draggable="false" src="https://a.tile.openstreetmap.org/17/28508/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: 90px;"><img id="t_17_28508_49931" draggable="false" src="https://b.tile.openstreetmap.org/17/28508/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: 346px;"><img id="t_17_28508_49932" draggable="false" src="https://c.tile.openstreetmap.org/17/28508/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: 602px;"><img id="t_17_28508_49933" draggable="false" src="https://a.tile.openstreetmap.org/17/28508/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: 858px;"><img id="t_17_28508_49934" draggable="false" src="https://b.tile.openstreetmap.org/17/28508/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: 1114px;"><img id="t_17_28509_49930" draggable="false" src="https://b.tile.openstreetmap.org/17/28509/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: 90px;"><img id="t_17_28509_49931" draggable="false" src="https://c.tile.openstreetmap.org/17/28509/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: 346px;"><img id="t_17_28509_49932" draggable="false" src="https://a.tile.openstreetmap.org/17/28509/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: 602px;"><img id="t_17_28509_49933" draggable="false" src="https://b.tile.openstreetmap.org/17/28509/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: 858px;"><img id="t_17_28509_49934" draggable="false" src="https://c.tile.openstreetmap.org/17/28509/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: 1114px;"><img id="t_17_28510_49930" draggable="false" src="https://c.tile.openstreetmap.org/17/28510/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: 90px;"><img id="t_17_28510_49931" draggable="false" src="https://a.tile.openstreetmap.org/17/28510/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: 346px;"><img id="t_17_28510_49932" draggable="false" src="https://b.tile.openstreetmap.org/17/28510/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: 602px;"><img id="t_17_28510_49933" draggable="false" src="https://c.tile.openstreetmap.org/17/28510/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: 858px;"><img id="t_17_28510_49934" draggable="false" src="https://a.tile.openstreetmap.org/17/28510/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: 1114px;"><img id="t_17_28511_49930" draggable="false" src="https://a.tile.openstreetmap.org/17/28511/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: 90px;"><img id="t_17_28511_49931" draggable="false" src="https://b.tile.openstreetmap.org/17/28511/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: 346px;"><img id="t_17_28511_49932" draggable="false" src="https://c.tile.openstreetmap.org/17/28511/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: 602px;"><img id="t_17_28511_49933" draggable="false" src="https://a.tile.openstreetmap.org/17/28511/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: 858px;"><img id="t_17_28511_49934" draggable="false" src="https://b.tile.openstreetmap.org/17/28511/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: 1114px;"><img id="t_17_28512_49930" draggable="false" src="https://b.tile.openstreetmap.org/17/28512/49930.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: 90px;"><img id="t_17_28512_49931" draggable="false" src="https://c.tile.openstreetmap.org/17/28512/49931.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: 346px;"><img id="t_17_28512_49932" draggable="false" src="https://a.tile.openstreetmap.org/17/28512/49932.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: 602px;"><img id="t_17_28512_49933" draggable="false" src="https://b.tile.openstreetmap.org/17/28512/49933.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: 858px;"><img id="t_17_28512_49934" draggable="false" src="https://c.tile.openstreetmap.org/17/28512/49934.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: 1114px;"><img id="t_17_28506_49929" draggable="false" src="https://a.tile.openstreetmap.org/17/28506/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: -68px; top: -166px;"><img id="t_17_28507_49929" draggable="false" src="https://b.tile.openstreetmap.org/17/28507/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 188px; top: -166px;"><img id="t_17_28508_49929" draggable="false" src="https://c.tile.openstreetmap.org/17/28508/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 444px; top: -166px;"><img id="t_17_28509_49929" draggable="false" src="https://a.tile.openstreetmap.org/17/28509/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 700px; top: -166px;"><img id="t_17_28510_49929" draggable="false" src="https://b.tile.openstreetmap.org/17/28510/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 956px; top: -166px;"><img id="t_17_28511_49929" draggable="false" src="https://c.tile.openstreetmap.org/17/28511/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1212px; top: -166px;"><img id="t_17_28512_49929" draggable="false" src="https://a.tile.openstreetmap.org/17/28512/49929.png" style="position: absolute; width: 256px; height: 256px; pointer-events: none; user-select: none; left: 1468px; top: -166px;"></div>
+    <div id="marker-layer"><div id="mk_1" class="bm" data-id="1" style="background: rgb(58, 58, 139); left: 451px; top: 166px; display: flex;">1</div><div id="mk_2" class="bm" data-id="2" style="background: rgb(122, 90, 42); left: 502px; top: 168px; display: flex;">2</div><div id="mk_3" class="bm" data-id="3" style="background: rgb(139, 58, 58); left: 601px; top: 289px; display: flex;">3</div><div id="mk_4" class="bm" data-id="4" style="background: rgb(139, 58, 58); left: 506px; top: 341px; display: flex;">4</div><div id="mk_5" class="bm" data-id="5" style="background: rgb(139, 58, 58); left: 515px; top: 396px; display: flex;">5</div><div id="mk_6" class="bm" data-id="6" style="background: rgb(139, 58, 58); left: 602px; top: 394px; display: flex;">6</div><div id="mk_7" class="bm" data-id="7" style="background: rgb(122, 90, 42); left: 557px; top: 334px; display: flex;">7</div><div id="mk_8" class="bm" data-id="8" style="background: rgb(122, 90, 42); left: 609px; top: 341px; display: flex;">8</div><div id="mk_9" class="bm" data-id="9" style="background: rgb(139, 58, 58); left: 515px; top: 289px; display: flex;">9</div><div id="mk_10" class="bm" data-id="10" style="background: rgb(139, 58, 58); left: 695px; top: 275px; display: flex;">10</div><div id="mk_11" class="bm" data-id="11" style="background: rgb(122, 90, 42); left: 694px; top: 310px; display: flex;">11</div><div id="mk_12" class="bm" data-id="12" style="background: rgb(139, 58, 58); left: 696px; top: 350px; display: flex;">12</div><div id="mk_13" class="bm" data-id="13" style="background: rgb(139, 58, 58); left: 757px; top: 415px; display: flex;">13</div><div id="mk_14" class="bm" data-id="14" style="background: rgb(139, 58, 58); left: 695px; top: 417px; display: flex;">14</div><div id="mk_15" class="bm" data-id="15" style="background: rgb(139, 58, 58); left: 771px; top: 273px; display: flex;">15</div><div id="mk_16" class="bm" data-id="16" style="background: rgb(46, 110, 46); left: 755px; top: 134px; display: flex;">16</div><div id="mk_17" class="bm" data-id="17" style="background: rgb(46, 110, 46); left: 716px; top: 171px; display: flex;">17</div><div id="mk_18" class="bm" data-id="18" style="background: rgb(46, 110, 46); left: 802px; top: 184px; display: flex;">18</div><div id="mk_19" class="bm" data-id="19" style="background: rgb(46, 110, 46); left: 796px; top: 101px; display: flex;">19</div><div id="mk_20" class="bm" data-id="20" style="background: rgb(90, 58, 122); left: 482px; top: 498px; display: flex;">20</div><div id="mk_21" class="bm" data-id="21" style="background: rgb(90, 58, 122); left: 426px; top: 494px; display: flex;">21</div><div id="mk_22" class="bm" data-id="22" style="background: rgb(90, 58, 122); left: 496px; top: 601px; display: flex;">22</div><div id="mk_23" class="bm" data-id="23" style="background: rgb(122, 90, 42); left: 329px; top: 584px; display: flex;">23</div></div>
 
     <!-- Admin top bar -->
     <div id="admin-save-bar">
@@ -273,7 +351,7 @@ body.admin-on #admin-save-bar{display:flex;}
     </div>
 
     <!-- View popup -->
-    <div id="popup">
+    <div id="popup" style="display: none;">
       <div class="pop-head" id="pop-head">
         <div class="pop-num" id="pop-num"></div>
         <div style="flex:1">
@@ -281,6 +359,12 @@ body.admin-on #admin-save-bar{display:flex;}
           <div class="pop-cat" id="pop-cat"></div>
         </div>
         <button class="pop-close" onclick="closePopup()">×</button>
+      </div>
+      <div class="pop-slider" id="pop-slider">
+        <div class="pop-slider-track" id="pop-slider-track"></div>
+        <button class="pop-slider-btn pop-slider-prev" id="pop-slider-prev" onclick="sliderStep(-1)">&#8249;</button>
+        <button class="pop-slider-btn pop-slider-next" id="pop-slider-next" onclick="sliderStep(1)">&#8250;</button>
+        <div class="pop-slider-dots" id="pop-slider-dots"></div>
       </div>
       <div class="pop-body">
         <div class="pop-desc" id="pop-desc"></div>
@@ -321,7 +405,7 @@ body.admin-on #admin-save-bar{display:flex;}
     <button id="add-fab" onclick="startAddMode()">+ Add Building</button>
 
     <!-- Admin edit panel -->
-    <div id="admin-panel">
+    <div id="admin-panel" class="">
       <div class="ap-head">
         <span class="ap-head-icon">✏️</span>
         <div>
@@ -357,14 +441,22 @@ body.admin-on #admin-save-bar{display:flex;}
         </div>
         <div class="ap-field">
           <label class="ap-label">Rooms / Spaces (one per line, e.g. A — Admissions)</label>
-          <textarea class="ap-textarea" id="ap-rooms" rows="3" placeholder="A — Admissions&#10;B — Bookstore&#10;C — Financial Aid"></textarea>
+          <textarea class="ap-textarea" id="ap-rooms" rows="3" placeholder="A — Admissions
+B — Bookstore
+C — Financial Aid"></textarea>
+        </div>
+        <div class="ap-field">
+          <label class="ap-label">Photos (one URL per line)</label>
+          <textarea class="ap-textarea" id="ap-photo" rows="3" placeholder="https://example.com/exterior.jpg
+https://example.com/classroom.jpg
+https://example.com/lobby.jpg"></textarea>
         </div>
         <div class="ap-coords">
-          <div>📍 Lat: <b id="ap-lat">—</b> &nbsp; Lng: <b id="ap-lng">—</b></div>
+          <div>📍 Lat: <b id="ap-lat">39.346411</b> &nbsp; Lng: <b id="ap-lng">-101.700360</b></div>
           <div class="ap-hint">Drag the marker to reposition</div>
         </div>
         <div class="ap-actions">
-          <button class="ap-delete" id="ap-delete-btn" onclick="deleteBuilding()">🗑 Delete Building</button>
+          <button class="ap-delete" id="ap-delete-btn" onclick="deleteBuilding()" style="display: block;">🗑 Delete Building</button>
           <button class="ap-btn ap-cancel" onclick="closeAdminPanel()">Cancel</button>
           <button class="ap-btn ap-save" onclick="saveBuilding()">💾 Save</button>
         </div>
@@ -372,7 +464,7 @@ body.admin-on #admin-save-bar{display:flex;}
     </div>
 
     <!-- Toast -->
-    <div id="toast"></div>
+    <div id="toast" style="display: none;">Building saved ✓</div>
   </div>
 </div>
 
@@ -386,59 +478,240 @@ const FB_CLS   ={all:'fb-all',admin:'fb-adm',prog:'fb-prg',housing:'fb-hse',ath:
 
 // __BLDGS_DATA_START__
 const BLDGS = [
-  {id:1, name:"Sharp Administration Building", cat:"admin", lat:39.3431, lng:-101.7011,
-   rooms:["A — Admissions","B — Bookstore","C — Business / Financial Aid Office","D — Testing Center","E — Automotive Technology"],
-   desc:"The main administrative hub of campus. Houses admissions, bookstore, financial aid, testing center, and automotive technology."},
-  {id:2, name:"Maintenance Storage", cat:"svc", lat:39.3435, lng:-101.7013, rooms:[],
-   desc:"Campus maintenance and storage facility."},
-  {id:3, name:"Medical Building", cat:"prog", lat:39.3440, lng:-101.7020,
-   rooms:["A — Respiratory Care","B — Medical Assistant","C — Crime Scene Investigation"],
-   desc:"Houses Respiratory Care, Medical Assistant, and Crime Scene Investigation programs."},
-  {id:4, name:"Cosmetology", cat:"prog", lat:39.3438, lng:-101.7001, rooms:[],
-   desc:"Full-service cosmetology program with professional salon facilities open to the public."},
-  {id:5, name:"Precision Agriculture Technology", cat:"prog", lat:39.3443, lng:-101.6997, rooms:[],
-   desc:"Modern precision agriculture technology training with current ag-tech equipment."},
-  {id:6, name:"Welding Technology", cat:"prog", lat:39.3448, lng:-101.7000, rooms:[],
-   desc:"Welding Technology program with fully equipped hands-on shop facilities."},
-  {id:7, name:"Memorial Union", cat:"svc", lat:39.3440, lng:-101.7007,
-   rooms:["A — Assembly Room","B — Cafeteria","C — Lyons Room","D — \"The Tiger's Den\" Deli"],
-   desc:"The heart of campus life — cafeteria, assembly room, Lyons Room, and The Tiger's Den Deli."},
-  {id:8, name:"Max Alderman Library & Resource Center", cat:"svc", lat:39.3447, lng:-101.7005, rooms:[],
-   desc:"Open 7 am–6 pm with periodicals, research databases, computer lab, and developmental resource center."},
-  {id:9, name:"Construction Building", cat:"prog", lat:39.3435, lng:-101.7007,
-   rooms:["A — Plumbing","B — Construction Technology"],
-   desc:"Houses Plumbing and Construction Technology programs with hands-on lab and shop space."},
-  {id:10, name:"Building 10", cat:"prog", lat:39.3443, lng:-101.7017, rooms:[],
-   desc:"Academic building along the Eustis Avenue corridor."},
-  {id:11, name:"Murray Center", cat:"svc", lat:39.3447, lng:-101.7014, rooms:[],
-   desc:"Multi-purpose campus facility used for classes, events, and community activities."},
-  {id:12, name:"Engineering Building", cat:"prog", lat:39.3452, lng:-101.7007,
-   rooms:["A — Civil Engineering Technology","B — Mechanical Engineering Technology"],
-   desc:"Houses Civil Engineering Technology and Mechanical Engineering Technology programs."},
-  {id:13, name:"Electrical Technology", cat:"prog", lat:39.3458, lng:-101.7006, rooms:[],
-   desc:"Electrical Technology program with fully equipped hands-on lab facilities."},
-  {id:14, name:"Digital Technology Building", cat:"prog", lat:39.3458, lng:-101.6999,
-   rooms:["A — Computer Graphics Technology","B — Business Technology","C — Child Care Specialist"],
-   desc:"Houses Computer Graphics Technology, Business Technology, and Child Care Specialist programs."},
-  {id:15, name:"Kansas Institute of Diesel Technology", cat:"prog", lat:39.3449, lng:-101.7024,
-   rooms:["A — Diesel Technology"],
-   desc:"Home of the Diesel Technology program — a premier diesel mechanic training facility."},
-  {id:16, name:"Laundry", cat:"housing", lat:39.3440, lng:-101.7033, rooms:[],
-   desc:"On-campus laundry facility available to all residential students."},
-  {id:17, name:"Village I", cat:"housing", lat:39.3442, lng:-101.7028, rooms:[],
-   desc:"Campus housing — Village I. Convenient on-campus living close to classes."},
-  {id:18, name:"Village II", cat:"housing", lat:39.3450, lng:-101.7031, rooms:[],
-   desc:"Campus housing — Village II with laundry and campus amenities nearby."},
-  {id:19, name:"Village III", cat:"housing", lat:39.3456, lng:-101.7036, rooms:[],
-   desc:"Campus housing — Village III. Three Villages provide affordable on-campus living."},
-  {id:20, name:"Larry Keirns Fitness Center", cat:"ath", lat:39.3451, lng:-101.6983, rooms:[],
-   desc:"On-campus fitness center with basketball court, weight room, cardio equipment, and locker rooms."},
-  {id:21, name:"Ed Mills Academic & Athletic Center", cat:"ath", lat:39.3446, lng:-101.6974, rooms:[],
-   desc:"Academic and athletic center supporting Fort Hays Tech Tigers NJCAA programs."},
-  {id:22, name:"Softball Fields", cat:"ath", lat:39.3456, lng:-101.6978, rooms:[],
-   desc:"Home softball facility for the Fort Hays Tech Tigers women's softball team."},
-  {id:23, name:"Price Convention Center", cat:"svc", lat:39.3437, lng:-101.6958, rooms:[],
-   desc:"Off-campus convention and event facility affiliated with Fort Hays Tech | Northwest."}
+  {
+    "id": 1,
+    "name": "Sharp Administration Building",
+    "cat": "admin",
+    "lat": 39.34641054055041,
+    "lng": -101.70035971031189,
+    "rooms": [
+      "A — Admissions",
+      "B — Bookstore",
+      "C — Business / Financial Aid Office",
+      "D — Testing Center",
+      "E — Automotive Technology"
+    ],
+    "desc": "The main administrative hub of campus. Houses admissions, bookstore, financial aid, testing center, and automotive technology."
+  },
+  {
+    "id": 2,
+    "name": "Maintenance Storage",
+    "cat": "svc",
+    "lat": 39.34639567786658,
+    "lng": -101.69981942062378,
+    "rooms": [],
+    "desc": "Campus maintenance and storage facility."
+  },
+  {
+    "id": 3,
+    "name": "Medical Building",
+    "cat": "prog",
+    "lat": 39.34538561595531,
+    "lng": -101.69874916267395,
+    "rooms": [
+      "A — Respiratory Care",
+      "B — Medical Assistant",
+      "C — Crime Scene Investigation"
+    ],
+    "desc": "Houses Respiratory Care, Medical Assistant, and Crime Scene Investigation programs."
+  },
+  {
+    "id": 4,
+    "name": "Cosmetology",
+    "cat": "prog",
+    "lat": 39.34496159939969,
+    "lng": -101.69977813491822,
+    "rooms": [],
+    "desc": "Full-service cosmetology program with professional salon facilities open to the public."
+  },
+  {
+    "id": 5,
+    "name": "Precision Agriculture Technology",
+    "cat": "prog",
+    "lat": 39.344499131272194,
+    "lng": -101.69967854232789,
+    "rooms": [],
+    "desc": "Modern precision agriculture technology training with current ag-tech equipment."
+  },
+  {
+    "id": 6,
+    "name": "Welding Technology",
+    "cat": "prog",
+    "lat": 39.34451789841133,
+    "lng": -101.69874472618103,
+    "rooms": [],
+    "desc": "Welding Technology program with fully equipped hands-on shop facilities."
+  },
+  {
+    "id": 7,
+    "name": "Memorial Union",
+    "cat": "svc",
+    "lat": 39.34501224909033,
+    "lng": -101.69923014945984,
+    "rooms": [
+      "A — Assembly Room",
+      "B — Cafeteria",
+      "C — Lyons Room",
+      "D — \"The Tiger's Den\" Deli"
+    ],
+    "desc": "The heart of campus life — cafeteria, assembly room, Lyons Room, and The Tiger's Den Deli."
+  },
+  {
+    "id": 8,
+    "name": "Max Alderman Library & Resource Center",
+    "cat": "svc",
+    "lat": 39.34495720964764,
+    "lng": -101.69866536903382,
+    "rooms": [],
+    "desc": "Open 7 am–6 pm with periodicals, research databases, computer lab, and developmental resource center."
+  },
+  {
+    "id": 9,
+    "name": "Construction Building",
+    "cat": "prog",
+    "lat": 39.34539174583229,
+    "lng": -101.69968076057434,
+    "rooms": [
+      "A — Plumbing",
+      "B — Construction Technology"
+    ],
+    "desc": "Houses Plumbing and Construction Technology programs with hands-on lab and shop space."
+  },
+  {
+    "id": 10,
+    "name": "Building 10",
+    "cat": "prog",
+    "lat": 39.34550307612864,
+    "lng": -101.69774105949402,
+    "rooms": [],
+    "desc": "Academic building along the Eustis Avenue corridor."
+  },
+  {
+    "id": 11,
+    "name": "Murray Center",
+    "cat": "svc",
+    "lat": 39.345214418348704,
+    "lng": -101.69775219573975,
+    "rooms": [],
+    "desc": "Multi-purpose campus facility used for classes, events, and community activities."
+  },
+  {
+    "id": 12,
+    "name": "Engineering Building",
+    "cat": "prog",
+    "lat": 39.34488471171877,
+    "lng": -101.69773884124756,
+    "rooms": [
+      "A — Civil Engineering Technology",
+      "B — Mechanical Engineering Technology"
+    ],
+    "desc": "Houses Civil Engineering Technology and Mechanical Engineering Technology programs."
+  },
+  {
+    "id": 13,
+    "name": "Electrical Technology",
+    "cat": "prog",
+    "lat": 39.34434801515203,
+    "lng": -101.69708094177246,
+    "rooms": [],
+    "desc": "Electrical Technology program with fully equipped hands-on lab facilities."
+  },
+  {
+    "id": 14,
+    "name": "Digital Technology Building",
+    "cat": "prog",
+    "lat": 39.34433142086515,
+    "lng": -101.69774350395203,
+    "rooms": [
+      "A — Computer Graphics Technology",
+      "B — Business Technology",
+      "C — Child Care Specialist"
+    ],
+    "desc": "Houses Computer Graphics Technology, Business Technology, and Child Care Specialist programs."
+  },
+  {
+    "id": 15,
+    "name": "Kansas Institute of Diesel Technology",
+    "cat": "prog",
+    "lat": 39.34552227799962,
+    "lng": -101.69692829360962,
+    "rooms": [
+      "A — Diesel Technology"
+    ],
+    "desc": "Home of the Diesel Technology program — a premier diesel mechanic training facility."
+  },
+  {
+    "id": 16,
+    "name": "Laundry",
+    "cat": "housing",
+    "lat": 39.34667164211155,
+    "lng": -101.69709873275757,
+    "rooms": [],
+    "desc": "On-campus laundry facility available to all residential students."
+  },
+  {
+    "id": 17,
+    "name": "Village I",
+    "cat": "housing",
+    "lat": 39.346365525219085,
+    "lng": -101.69752141265869,
+    "rooms": [],
+    "desc": "Campus housing — Village I. Convenient on-campus living close to classes."
+  },
+  {
+    "id": 18,
+    "name": "Village II",
+    "cat": "housing",
+    "lat": 39.34626114251046,
+    "lng": -101.6965983253479,
+    "rooms": [],
+    "desc": "Campus housing — Village II with laundry and campus amenities nearby."
+  },
+  {
+    "id": 19,
+    "name": "Village III",
+    "cat": "housing",
+    "lat": 39.346952396908996,
+    "lng": -101.69665844306945,
+    "rooms": [],
+    "desc": "Campus housing — Village III. Three Villages provide affordable on-campus living."
+  },
+  {
+    "id": 20,
+    "name": "Larry Keirns Fitness Center",
+    "cat": "ath",
+    "lat": 39.34365629783426,
+    "lng": -101.7000273426056,
+    "rooms": [],
+    "desc": "On-campus fitness center with basketball court, weight room, cardio equipment, and locker rooms."
+  },
+  {
+    "id": 21,
+    "name": "Ed Mills Academic & Athletic Center",
+    "cat": "ath",
+    "lat": 39.3436873116606,
+    "lng": -101.70062937965393,
+    "rooms": [],
+    "desc": "Academic and athletic center supporting Fort Hays Tech Tigers NJCAA programs."
+  },
+  {
+    "id": 22,
+    "name": "Softball Fields",
+    "cat": "ath",
+    "lat": 39.342803857146656,
+    "lng": -101.69988139419556,
+    "rooms": [],
+    "desc": "Home softball facility for the Fort Hays Tech Tigers women's softball team."
+  },
+  {
+    "id": 23,
+    "name": "Price Convention Center",
+    "cat": "svc",
+    "lat": 39.34294494895716,
+    "lng": -101.70166867332459,
+    "rooms": [],
+    "desc": "Off-campus convention and event facility affiliated with Fort Hays Tech | Northwest."
+  }
 ];
 // __BLDGS_DATA_END__
 
@@ -717,12 +990,35 @@ function selectBuilding(id){
   document.getElementById('pop-title').textContent=b.name;
   document.getElementById('pop-cat').textContent=CAT_LABEL[b.cat];
   document.getElementById('pop-desc').textContent=b.desc;
+  buildSlider(b.photos||[]);
   const rEl=document.getElementById('pop-rooms');
   rEl.innerHTML=b.rooms.length?`<div class="pop-rl">Spaces &amp; Programs</div>${b.rooms.map(r=>`<div class="pop-room">${r}</div>`).join('')}`:'';
   popup.style.display='block';
   repositionPopup();
 }
 
+let sliderIdx=0,sliderPhotos=[];
+function buildSlider(photos){
+  sliderPhotos=photos; sliderIdx=0;
+  const el=document.getElementById('pop-slider');
+  const track=document.getElementById('pop-slider-track');
+  const dots=document.getElementById('pop-slider-dots');
+  const prev=document.getElementById('pop-slider-prev');
+  const next=document.getElementById('pop-slider-next');
+  if(!photos.length){el.style.display='none';track.innerHTML='';dots.innerHTML='';return;}
+  el.style.display='block';
+  track.innerHTML=photos.map(u=>`<img src="${u}" alt="">`).join('');
+  dots.innerHTML=photos.map((_,i)=>`<span class="pop-slider-dot${i===0?' active':''}" onclick="sliderGoto(${i})"></span>`).join('');
+  prev.style.display=photos.length>1?'block':'none';
+  next.style.display=photos.length>1?'block':'none';
+  track.style.transform='translateX(0)';
+}
+function sliderGoto(i){
+  sliderIdx=Math.max(0,Math.min(i,sliderPhotos.length-1));
+  document.getElementById('pop-slider-track').style.transform=`translateX(-${sliderIdx*100}%)`;
+  document.querySelectorAll('.pop-slider-dot').forEach((d,j)=>d.classList.toggle('active',j===sliderIdx));
+}
+function sliderStep(dir){sliderGoto((sliderIdx+dir+sliderPhotos.length)%sliderPhotos.length);}
 function repositionPopup(){
   const b=BLDGS.find(x=>x.id===selId); if(!b||popup.style.display==='none') return;
   const W=outer.clientWidth,H=outer.clientHeight;
@@ -747,12 +1043,25 @@ function closePopup(){
 // ADMIN MODE
 // ─────────────────────────────────────────
 // ── Secret key sequence: type "TIGER" anywhere to toggle admin ──
+// Also: triple-click the header logo as a fallback
 (function(){
-  const seq='tiger';let buf='';
-  document.addEventListener('keydown',e=>{
-    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  const seq='tiger'; let buf=''; let resetTimer;
+  document.addEventListener('keyup',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+    if(e.key.length>1&&e.key!=='Enter') return; // ignore Shift, Alt etc
+    clearTimeout(resetTimer);
     buf=(buf+e.key.toLowerCase()).slice(-seq.length);
-    if(buf===seq) toggleAdmin();
+    if(buf===seq){buf='';toggleAdmin();return;}
+    resetTimer=setTimeout(()=>{buf='';},3000);
+  });
+  // Triple-click logo fallback
+  let logoClicks=0,logoTimer;
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.header-logo')) return;
+    logoClicks++;
+    clearTimeout(logoTimer);
+    logoTimer=setTimeout(()=>{logoClicks=0;},600);
+    if(logoClicks>=3){logoClicks=0;toggleAdmin();}
   });
 })();
 
@@ -813,6 +1122,7 @@ function openAdminPanel(id,isNew=false){
   document.getElementById('ap-cat').value=b.cat;
   document.getElementById('ap-desc').value=b.desc;
   document.getElementById('ap-rooms').value=b.rooms.join('\n');
+  document.getElementById('ap-photo').value=(b.photos||[]).join('\n');
   document.getElementById('ap-lat').textContent=b.lat.toFixed(6);
   document.getElementById('ap-lng').textContent=b.lng.toFixed(6);
   document.getElementById('ap-delete-btn').style.display=isNew?'none':'block';
@@ -839,6 +1149,7 @@ function saveBuilding(){
   b.cat=document.getElementById('ap-cat').value;
   b.desc=document.getElementById('ap-desc').value.trim();
   b.rooms=document.getElementById('ap-rooms').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  b.photos=document.getElementById('ap-photo').value.split('\n').map(s=>s.trim()).filter(Boolean);
   persist();
   buildSidebar();
   closeAdminPanel();
@@ -928,7 +1239,7 @@ function exportHTML(){
   const blob=new Blob([updated],{type:'text/html'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='campus-map.html';
+  a.download='index.html';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(a.href);
   showToast('Map exported ✓');
@@ -956,5 +1267,6 @@ new ResizeObserver(()=>render()).observe(outer);
 buildSidebar();
 render();
 </script>
-</body>
-</html>
+
+
+</body><beak-overlay id="overlay-shadow-host"></beak-overlay><grammarly-desktop-integration data-grammarly-shadow-root="true" style="visibility: visible !important;"></grammarly-desktop-integration></html>
