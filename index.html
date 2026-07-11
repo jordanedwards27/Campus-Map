@@ -37,14 +37,6 @@ body.admin-on header{border-bottom-color:var(--admin-red);}
 }
 body.admin-on .admin-badge{display:block;}
 
-/* Admin toggle btn */
-#admin-toggle{
-  padding:5px 13px;border-radius:6px;border:1.5px solid #555;
-  background:transparent;color:#aaa;font-size:11px;font-weight:600;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-}
-#admin-toggle:hover{border-color:#aaa;color:white;}
-body.admin-on #admin-toggle{background:var(--admin-red);border-color:var(--admin-red);color:white;}
 
 /* ── Shell ── */
 .shell{display:flex;height:calc(100vh - 50px);}
@@ -247,7 +239,6 @@ body.admin-on #admin-save-bar{display:flex;}
     ✉ <a href="mailto:admissions@fhnw.edu">admissions@fhnw.edu</a> ·
     <a href="https://www.fhnw.edu" target="_blank">fhnw.edu</a>
   </div>
-  <button id="admin-toggle" onclick="toggleAdmin()">⚙ Admin</button>
 </header>
 
 <div class="shell">
@@ -755,18 +746,21 @@ function closePopup(){
 // ─────────────────────────────────────────
 // ADMIN MODE
 // ─────────────────────────────────────────
+// ── Secret key sequence: type "TIGER" anywhere to toggle admin ──
+(function(){
+  const seq='tiger';let buf='';
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+    buf=(buf+e.key.toLowerCase()).slice(-seq.length);
+    if(buf===seq) toggleAdmin();
+  });
+})();
+
 function toggleAdmin(){
-  if(!adminMode){
-    const pw=prompt('Enter admin password:');
-    if(pw===null) return; // cancelled
-    const _a=['dGln','ZXJz'],_b=atob(_a.join(''));
-    if(pw.toLowerCase()!==_b){
-      alert('Incorrect password.'); return;
-    }
-  }
   adminMode=!adminMode;
   document.body.classList.toggle('admin-on',adminMode);
   if(!adminMode){cancelAddMode();closeAdminPanel();}
+  showToast(adminMode?'Admin mode on':'Admin mode off');
   render();
 }
 
