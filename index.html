@@ -195,6 +195,10 @@ body.admin-on #add-fab{display:block;}
 }
 .ap-input:focus,.ap-select:focus,.ap-textarea:focus{border-color:var(--admin-red);}
 .ap-textarea{resize:vertical;min-height:70px;}
+.ap-thumb-wrap{position:relative;width:64px;height:48px;border-radius:4px;overflow:hidden;border:1px solid #ddd;}
+.ap-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.ap-thumb-del{position:absolute;top:1px;right:2px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:11px;line-height:16px;text-align:center;cursor:pointer;padding:0;}
+.ap-thumb-del:hover{background:var(--admin-red);}
 .ap-coords{
   background:#f8f8f8;border:1px solid #eee;border-radius:6px;
   padding:8px 12px;font-size:11px;color:#555;margin-bottom:12px;
@@ -446,10 +450,12 @@ B — Bookstore
 C — Financial Aid"></textarea>
         </div>
         <div class="ap-field">
-          <label class="ap-label">Photos (one URL per line)</label>
-          <textarea class="ap-textarea" id="ap-photo" rows="3" placeholder="https://example.com/exterior.jpg
-https://example.com/classroom.jpg
-https://example.com/lobby.jpg"></textarea>
+          <label class="ap-label">Photos</label>
+          <div class="ap-photo-upload-area" id="ap-photo-upload-area">
+            <input type="file" id="ap-photo-file" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(this)">
+            <button type="button" class="ap-btn" style="width:100%;margin-bottom:6px;" onclick="document.getElementById('ap-photo-file').click()">📷 Upload Photos</button>
+            <div id="ap-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+          </div>
         </div>
         <div class="ap-coords">
           <div>📍 Lat: <b id="ap-lat">39.346411</b> &nbsp; Lng: <b id="ap-lng">-101.700360</b></div>
@@ -994,6 +1000,38 @@ function selectBuilding(id){
   repositionPopup();
 }
 
+// ─────────────────────────────────────────
+// PHOTO UPLOAD (admin)
+// ─────────────────────────────────────────
+let _adminPhotos=[]; // working array while editing
+
+function renderPhotoThumbs(){
+  const container=document.getElementById('ap-photo-thumbs');
+  container.innerHTML='';
+  _adminPhotos.forEach((src,i)=>{
+    const wrap=document.createElement('div'); wrap.className='ap-thumb-wrap';
+    const img=document.createElement('img'); img.src=src; img.alt='';
+    const del=document.createElement('button'); del.className='ap-thumb-del'; del.textContent='×';
+    del.title='Remove'; del.onclick=()=>{_adminPhotos.splice(i,1);renderPhotoThumbs();};
+    wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
+  });
+}
+
+function handlePhotoUpload(input){
+  const files=Array.from(input.files);
+  let loaded=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      _adminPhotos.push(ev.target.result);
+      loaded++;
+      if(loaded===files.length) renderPhotoThumbs();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value=''; // reset so same file can be re-added
+}
+
 let sliderIdx=0,sliderPhotos=[];
 function buildSlider(photos){
   sliderPhotos=photos; sliderIdx=0;
@@ -1125,7 +1163,7 @@ function openAdminPanel(id,isNew=false){
   document.getElementById('ap-cat').value=b.cat;
   document.getElementById('ap-desc').value=b.desc;
   document.getElementById('ap-rooms').value=b.rooms.join('\n');
-  document.getElementById('ap-photo').value=(b.photos||[]).join('\n');
+  _adminPhotos=[...(b.photos||[])]; renderPhotoThumbs();
   document.getElementById('ap-lat').textContent=b.lat.toFixed(6);
   document.getElementById('ap-lng').textContent=b.lng.toFixed(6);
   document.getElementById('ap-delete-btn').style.display=isNew?'none':'block';
@@ -1152,7 +1190,7 @@ function saveBuilding(){
   b.cat=document.getElementById('ap-cat').value;
   b.desc=document.getElementById('ap-desc').value.trim();
   b.rooms=document.getElementById('ap-rooms').value.split('\n').map(s=>s.trim()).filter(Boolean);
-  b.photos=document.getElementById('ap-photo').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  b.photos=[..._adminPhotos];
   persist();
   buildSidebar();
   closeAdminPanel();
@@ -1268,6 +1306,7 @@ new ResizeObserver(()=>render()).observe(outer);
 // ─────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────
+mkrLayer.innerHTML=''; // clear pre-baked markers so they're recreated with event listeners
 buildSidebar();
 render();
 </script>
