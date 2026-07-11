@@ -482,8 +482,12 @@ C — Financial Aid"></textarea>
         <div class="ap-field">
           <label class="ap-label">Photos</label>
           <div class="ap-photo-upload-area" id="ap-photo-upload-area">
+            <div style="display:flex;gap:6px;margin-bottom:6px;">
+              <input class="ap-input" id="ap-photo-url" type="url" placeholder="Paste Google Drive or image URL…" style="flex:1;margin:0;">
+              <button type="button" class="ap-btn ap-save" style="white-space:nowrap;" onclick="addPhotoUrl()">Add</button>
+            </div>
             <input type="file" id="ap-photo-file" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(this)">
-            <button type="button" class="ap-btn" style="width:100%;margin-bottom:6px;" onclick="document.getElementById('ap-photo-file').click()">📷 Upload Photos</button>
+            <button type="button" class="ap-btn" style="width:100%;margin-bottom:6px;" onclick="document.getElementById('ap-photo-file').click()">📷 Upload from computer</button>
             <div id="ap-photo-thumbs" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
           </div>
         </div>
@@ -1044,6 +1048,23 @@ function renderPhotoThumbs(){
   });
 }
 
+function convertDriveUrl(url){
+  // Convert Drive sharing link to direct embeddable URL
+  const m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/uc?export=view&id='+m[1];
+  return url;
+}
+
+function addPhotoUrl(){
+  const inp=document.getElementById('ap-photo-url');
+  const raw=inp.value.trim();
+  if(!raw) return;
+  const url=convertDriveUrl(raw);
+  _adminPhotos.push(url);
+  renderPhotoThumbs();
+  inp.value='';
+}
+
 function compressImage(dataURL){
   return new Promise(resolve=>{
     const img=new Image();
@@ -1061,15 +1082,48 @@ function compressImage(dataURL){
 }
 
 function handlePhotoUpload(input){
+  const url=localStorage.getItem('fhnw_sheets_url');
   const files=Array.from(input.files);
-  let loaded=0;
+  let done=0;
+  const total=files.length;
+  const thumbsEl=document.getElementById('ap-photo-thumbs');
+
   files.forEach(file=>{
+    // Show uploading placeholder
+    const placeholder=document.createElement('div');
+    placeholder.className='ap-thumb-wrap';
+    placeholder.style.cssText='display:flex;align-items:center;justify-content:center;font-size:10px;color:#888;height:70px;';
+    placeholder.textContent='Uploading…';
+    thumbsEl.appendChild(placeholder);
+
     const reader=new FileReader();
     reader.onload=ev=>{
       compressImage(ev.target.result).then(compressed=>{
-        _adminPhotos.push(compressed);
-        loaded++;
-        if(loaded===files.length) renderPhotoThumbs();
+        if(url){
+          // Upload to Drive via Apps Script, store URL
+          fetch(url,{
+            method:'POST',
+            body:JSON.stringify({action:'uploadPhoto',base64:compressed,mimeType:file.type,filename:file.name}),
+            credentials:'omit'
+          })
+          .then(r=>r.json())
+          .then(res=>{
+            placeholder.remove();
+            if(res.ok&&res.url) _adminPhotos.push(res.url);
+            else _adminPhotos.push(compressed); // fallback to base64
+            done++; if(done===total) renderPhotoThumbs();
+          })
+          .catch(()=>{
+            placeholder.remove();
+            _adminPhotos.push(compressed); // fallback to base64
+            done++; if(done===total) renderPhotoThumbs();
+          });
+        } else {
+          // No Sheets connected — store base64 locally
+          placeholder.remove();
+          _adminPhotos.push(compressed);
+          done++; if(done===total) renderPhotoThumbs();
+        }
       });
     };
     reader.readAsDataURL(file);
@@ -1209,6 +1263,7 @@ function openAdminPanel(id,isNew=false){
   document.getElementById('ap-desc').value=b.desc;
   document.getElementById('ap-rooms').value=b.rooms.join('\n');
   _adminPhotos=[...(b.photos||[])]; renderPhotoThumbs();
+  const pu=document.getElementById('ap-photo-url'); if(pu) pu.value='';
   document.getElementById('ap-lat').textContent=b.lat.toFixed(6);
   document.getElementById('ap-lng').textContent=b.lng.toFixed(6);
   document.getElementById('ap-delete-btn').style.display=isNew?'none':'block';
@@ -1319,7 +1374,30 @@ function highlightSidebar(id){
 // ─────────────────────────────────────────
 // PERSISTENCE
 // ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// PHOTO PERSISTENCE (localStorage)
+// Photos are too large for Sheets, so they live in localStorage.
+// They survive HTML file replacements as long as you use the same browser.
+// ─────────────────────────────────────────
+function savePhotos(){
+  try{
+    const cache={};
+    BLDGS.forEach(b=>{if(b.photos&&b.photos.length) cache[b.id]=b.photos;});
+    localStorage.setItem('fhnw_photos',JSON.stringify(cache));
+  }catch(e){}
+}
+
+function loadPhotos(){
+  try{
+    const raw=localStorage.getItem('fhnw_photos');
+    if(!raw) return;
+    const cache=JSON.parse(raw);
+    BLDGS.forEach(b=>{if(cache[b.id]) b.photos=cache[b.id];});
+  }catch(e){}
+}
+
 function persist(){
+  savePhotos();
   const url=localStorage.getItem('fhnw_sheets_url');
   if(url) pushToSheets(false);
 }
@@ -1344,8 +1422,7 @@ function pushToSheets(showFeedback){
   const url=localStorage.getItem('fhnw_sheets_url');
   if(!url){if(showFeedback)sheetStatus('No Sheet connected yet','err');return;}
   if(showFeedback) sheetStatus('Saving…');
-  // Strip base64 photos before sending — they're too large for Sheets.
-  // Photos are saved in the exported HTML instead.
+  // Strip any base64 photos (too large for Sheets) — Drive URLs pass through fine
   const payload=BLDGS.map(b=>({...b,photos:(b.photos||[]).filter(p=>!p.startsWith('data:'))}));
   fetch(url,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'})
     .then(()=>{
@@ -1375,6 +1452,7 @@ function loadFromSheets(url){
       BLDGS.length=0;
       data.forEach(b=>BLDGS.push(b));
       try{localStorage.setItem('fhnw_bldgs',JSON.stringify(BLDGS));}catch(e){}
+      loadPhotos();
       buildSidebar(); render();
       sheetStatus(`Loaded ${data.length} buildings from Sheet ✓`,'ok');
     })
@@ -1416,6 +1494,7 @@ new ResizeObserver(()=>render()).observe(outer);
 // INIT
 // ─────────────────────────────────────────
 mkrLayer.innerHTML=''; // clear pre-baked markers so they're recreated with event listeners
+loadPhotos();  // restore saved photos from localStorage before first render
 buildSidebar();
 render();
 
