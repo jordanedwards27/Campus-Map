@@ -2,9 +2,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fort Hays Tech | Northwest — Campus Map</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 <style>
 :root{
   --black:#1a1a1a;--gold:#fbbe00;--gold-d:#d4a700;
@@ -328,6 +330,41 @@ body.admin-on #admin-save-bar{display:flex;}
   .asb-msg{display:none;}
 }
 
+/* ── Visitor 360° Tour overlay ── */
+#tour-overlay{display:none;position:fixed;inset:0;z-index:2000;background:#111;flex-direction:column;}
+#tour-overlay.open{display:flex;}
+#tour-hdr{background:#1a1a1a;color:white;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:3px solid var(--gold);}
+#tour-hdr-info{flex:1;}
+#tour-hdr-bldg{font-size:10.5px;color:#aaa;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+#tour-hdr-room{font-size:14px;font-weight:800;}
+#tour-pano{flex:1;min-height:0;}
+#tour-room-bar{background:#111;display:flex;gap:6px;padding:8px 12px;overflow-x:auto;flex-shrink:0;border-top:1px solid #333;}
+.tour-room-btn{padding:5px 12px;border-radius:20px;border:1px solid #444;background:none;color:#ccc;font-size:11px;cursor:pointer;white-space:nowrap;font-family:'Barlow',sans-serif;transition:all .15s;}
+.tour-room-btn.active{background:var(--gold);color:#111;border-color:var(--gold);font-weight:700;}
+.tour-room-btn:hover:not(.active){background:#2a2a2a;}
+.tour-close-btn{background:none;border:1px solid #555;color:#fff;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;font-family:'Barlow',sans-serif;white-space:nowrap;}
+.tour-close-btn:hover{background:#333;}
+
+/* ── Admin 360° Tour editor ── */
+#tour-editor{display:none;position:fixed;inset:0;z-index:3000;background:#111;flex-direction:column;}
+#tour-editor.open{display:flex;}
+#tour-ed-hdr{background:#1a1a1a;color:white;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;border-bottom:3px solid var(--admin-red);}
+#tour-ed-title{font-size:13px;font-weight:700;flex:1;}
+#tour-ed-wrap{flex:1;position:relative;min-height:0;}
+#tour-ed-pano{width:100%;height:100%;}
+#tour-place-overlay{display:none;position:absolute;inset:0;z-index:99;cursor:crosshair;}
+#tour-place-hint{display:none;position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:100;pointer-events:none;background:rgba(0,0,0,.85);color:white;padding:10px 20px;border-radius:24px;font-size:12px;font-weight:600;white-space:nowrap;border:2px solid var(--gold);}
+#tour-ed-controls{background:#1a1a1a;border-top:1px solid #2a2a2a;padding:10px 14px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
+.tour-ed-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.tour-ed-select{padding:6px 9px;border:1.5px solid #444;border-radius:6px;background:#222;color:#fff;font-size:11.5px;font-family:'Barlow',sans-serif;outline:none;}
+.tour-ed-btn{padding:7px 14px;border:none;border-radius:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap;}
+.tour-ed-btn-place{background:var(--gold);color:#111;}
+.tour-ed-btn-place.placing{background:#c0392b;color:white;}
+#tour-ed-hs-list{display:flex;flex-wrap:wrap;gap:5px;min-height:18px;}
+.tour-hs-tag{display:flex;align-items:center;gap:4px;background:#2a2a2a;color:#ddd;padding:4px 10px;border-radius:20px;font-size:11px;}
+.tour-hs-del{background:none;border:none;color:#c0392b;cursor:pointer;font-size:15px;padding:0 2px;line-height:1;}
+.tour-hs-del:hover{color:#ff4444;}
+
 /* ── Admin room editor ── */
 .ap-room-item{border:1.5px solid #eee;border-radius:6px;padding:9px;margin-bottom:8px;background:#fafafa;}
 .ap-room-header{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
@@ -474,6 +511,7 @@ body.admin-on #admin-save-bar{display:flex;}
         <div class="pop-slider-dots" id="pop-slider-dots"></div>
       </div>
       <div class="pop-body">
+        <button id="pop-tour-btn" style="display:none;width:100%;margin-bottom:9px;padding:8px;background:var(--gold);color:#111;border:none;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;font-family:'Barlow',sans-serif;letter-spacing:.3px;">🔄 Start Building Tour</button>
         <div class="pop-desc" id="pop-desc"></div>
         <div id="pop-rooms"></div>
       </div>
@@ -563,6 +601,9 @@ body.admin-on #admin-save-bar{display:flex;}
           <label class="ap-label">Spaces &amp; Rooms</label>
           <div id="ap-rooms-list"></div>
           <button type="button" class="ap-add-room-btn" onclick="addAdminRoom()">+ Add Space / Room</button>
+          <div id="ap-tour-edit-wrap" style="display:none;margin-top:8px;">
+            <button type="button" onclick="openTourEditor(editingId)" style="width:100%;padding:8px;background:#1a1a6b;color:white;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;font-family:'Barlow',sans-serif;">🔄 Edit 360° Tour Connections</button>
+          </div>
         </div>
         <div class="ap-field">
           <label class="ap-label">Photos</label>
@@ -590,6 +631,45 @@ body.admin-on #admin-save-bar{display:flex;}
 
     <!-- Toast -->
     <div id="toast" style="display: none;">Building saved ✓</div>
+
+    <!-- Visitor 360° Tour overlay -->
+    <div id="tour-overlay">
+      <div id="tour-hdr">
+        <div id="tour-hdr-info">
+          <div id="tour-hdr-bldg"></div>
+          <div id="tour-hdr-room"></div>
+        </div>
+        <button class="tour-close-btn" onclick="closeVisitorTour()">✕ Exit Tour</button>
+      </div>
+      <div id="tour-pano"></div>
+      <div id="tour-room-bar"></div>
+    </div>
+
+    <!-- Admin 360° Tour editor -->
+    <div id="tour-editor">
+      <div id="tour-ed-hdr">
+        <div id="tour-ed-title">Tour Editor</div>
+        <button class="tour-close-btn" onclick="closeTourEditor()">✕ Done Editing</button>
+      </div>
+      <div id="tour-ed-wrap">
+        <div id="tour-ed-pano"></div>
+        <div id="tour-place-overlay" onclick="handlePlaceClick(event)"></div>
+        <div id="tour-place-hint">Click anywhere in the 360° view to place a navigation arrow</div>
+      </div>
+      <div id="tour-ed-controls">
+        <div class="tour-ed-row">
+          <span style="color:#ccc;font-size:11px;font-weight:700;white-space:nowrap">Editing room:</span>
+          <select class="tour-ed-select" id="tour-ed-room-sel" onchange="switchTeRoom(this.value)"></select>
+          <span style="color:#888;font-size:10px;margin-left:auto">Look around, then place arrows at doorways</span>
+        </div>
+        <div class="tour-ed-row">
+          <span style="color:#aaa;font-size:11px;white-space:nowrap">Arrow leads to:</span>
+          <select class="tour-ed-select" id="tour-ed-connect-sel"></select>
+          <button class="tour-ed-btn tour-ed-btn-place" id="tour-place-btn" onclick="startPlaceMode()">📍 Click to Place Arrow</button>
+        </div>
+        <div id="tour-ed-hs-list"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -844,8 +924,8 @@ const BLDGS = [
 // ROOM HELPERS — rooms are now objects {name,photos,link}
 // ─────────────────────────────────────────
 function normalizeRoom(r){
-  if(typeof r==='string') return{name:r,photos:[],link:''};
-  return{name:r.name||'',photos:Array.isArray(r.photos)?r.photos:[],link:r.link||''};
+  if(typeof r==='string') return{name:r,photos:[],link:'',tour360:'',hotspots:[]};
+  return{name:r.name||'',photos:Array.isArray(r.photos)?r.photos:[],link:r.link||'',tour360:r.tour360||'',hotspots:Array.isArray(r.hotspots)?r.hotspots:[]};
 }
 function normalizeRooms(arr){return(arr||[]).map(normalizeRoom);}
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -1119,6 +1199,9 @@ function selectBuilding(id){
   buildSlider(b.photos||[]);
   popRoomStates={};
   buildPopupRooms(b,document.getElementById('pop-rooms'));
+  const hasTour=normalizeRooms(b.rooms).some(r=>r.tour360);
+  const tourBtn=document.getElementById('pop-tour-btn');
+  if(tourBtn){tourBtn.style.display=hasTour?'block':'none';tourBtn.onclick=()=>openVisitorTour(b.id);}
   popup.style.display='block';
   repositionPopup();
 }
@@ -1147,10 +1230,208 @@ function renderPhotoThumbs(){
 }
 
 function convertDriveUrl(url){
-  // Convert Drive sharing link to direct embeddable URL
   const m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
   if(m) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w1200';
   return url;
+}
+function convertDriveUrl360(url){
+  // Use higher resolution for 360° equirectangular images
+  const m=url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w4096';
+  return url;
+}
+
+// ─────────────────────────────────────────
+// 360° TOUR — VISITOR
+// ─────────────────────────────────────────
+let _tViewer=null, _tBldgId=null;
+
+function openVisitorTour(bldgId){
+  const b=BLDGS.find(x=>x.id===bldgId); if(!b) return;
+  const allR=normalizeRooms(b.rooms);
+  const tR=allR.map((r,i)=>({r,i})).filter(x=>x.r.tour360);
+  if(!tR.length){showToast('No 360° photos added yet');return;}
+  _tBldgId=bldgId;
+  closePopup();
+  document.getElementById('tour-hdr-bldg').textContent=b.name;
+  document.getElementById('tour-overlay').classList.add('open');
+  _buildTour(b,allR,tR);
+}
+
+function _buildTour(b,allR,tR){
+  // Room bar
+  const bar=document.getElementById('tour-room-bar');
+  bar.innerHTML=tR.map((x,ti)=>
+    `<button class="tour-room-btn${ti===0?' active':''}" data-sid="room_${x.i}"
+     onclick="jumpTour('room_${x.i}',this)">${escHtml(x.r.name)}</button>`
+  ).join('');
+  document.getElementById('tour-hdr-room').textContent=tR[0].r.name;
+
+  // Build Pannellum scenes
+  const scenes={};
+  tR.forEach(({r,i})=>{
+    scenes['room_'+i]={
+      title:r.name, type:'equirectangular', panorama:r.tour360,
+      hotSpots:(r.hotspots||[]).map((hs,hi)=>{
+        const tr=allR[hs.toRoomIdx];
+        if(!tr||!tr.tour360) return null;
+        return{id:'hs_'+i+'_'+hi,pitch:hs.pitch,yaw:hs.yaw,
+               type:'scene',text:escHtml(tr.name),sceneId:'room_'+hs.toRoomIdx};
+      }).filter(Boolean)
+    };
+  });
+
+  if(_tViewer){_tViewer.destroy();_tViewer=null;}
+  document.getElementById('tour-pano').innerHTML='';
+  _tViewer=pannellum.viewer('tour-pano',{
+    default:{firstScene:'room_'+tR[0].i,sceneFadeDuration:1000,autoLoad:true},
+    scenes
+  });
+  _tViewer.on('scenechange',sid=>{
+    const idx=parseInt(sid.replace('room_',''));
+    const r=allR[idx]; if(r) document.getElementById('tour-hdr-room').textContent=r.name;
+    document.querySelectorAll('.tour-room-btn').forEach(b=>b.classList.toggle('active',b.dataset.sid===sid));
+  });
+}
+
+function jumpTour(sid,btn){
+  if(_tViewer) _tViewer.loadScene(sid);
+  document.querySelectorAll('.tour-room-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+function closeVisitorTour(){
+  document.getElementById('tour-overlay').classList.remove('open');
+  if(_tViewer){_tViewer.destroy();_tViewer=null;}
+  document.getElementById('tour-pano').innerHTML='';
+}
+
+// ─────────────────────────────────────────
+// 360° TOUR — ADMIN EDITOR
+// ─────────────────────────────────────────
+let _teViewer=null, _teRoomIdx=0, _placing=false;
+
+function openTourEditor(bldgId){
+  collectAdminRoomValues();
+  if(!_adminRooms.some(r=>r.tour360)){
+    showToast('Add 360° photo URLs to rooms first');return;
+  }
+  const b=BLDGS.find(x=>x.id===bldgId);
+  document.getElementById('tour-ed-title').textContent='Tour Editor'+(b?' — '+b.name:'');
+  const sel=document.getElementById('tour-ed-room-sel');
+  sel.innerHTML=_adminRooms.map((r,i)=>r.tour360?
+    `<option value="${i}">${escHtml(r.name||'Room '+(i+1))}</option>`:''
+  ).join('');
+  _teRoomIdx=_adminRooms.findIndex(r=>r.tour360);
+  sel.value=_teRoomIdx;
+  document.getElementById('tour-editor').classList.add('open');
+  _switchTeRoom(_teRoomIdx);
+}
+
+function switchTeRoom(v){
+  _teRoomIdx=parseInt(v);
+  _switchTeRoom(_teRoomIdx);
+}
+
+function _switchTeRoom(i){
+  cancelPlaceMode();
+  const room=_adminRooms[i]; if(!room||!room.tour360) return;
+  const csel=document.getElementById('tour-ed-connect-sel');
+  csel.innerHTML=_adminRooms.map((r,j)=>{
+    if(j===i||!r.tour360) return '';
+    return `<option value="${j}">${escHtml(r.name||'Room '+(j+1))}</option>`;
+  }).join('');
+  if(!csel.options.length) csel.innerHTML='<option disabled value="">No other 360° rooms yet</option>';
+  _loadTeViewer(room,i);
+  _renderTeHotspots(i);
+}
+
+function _loadTeViewer(room,roomIdx){
+  if(_teViewer){_teViewer.destroy();_teViewer=null;}
+  document.getElementById('tour-ed-pano').innerHTML='';
+  const hotSpots=(_adminRooms[roomIdx]?.hotspots||[]).map((hs,hi)=>{
+    const tr=_adminRooms[hs.toRoomIdx];
+    return{id:'hs_ed_'+hi,pitch:hs.pitch,yaw:hs.yaw,type:'info',
+           text:'→ '+(tr?.name||'Room')};
+  });
+  _teViewer=pannellum.viewer('tour-ed-pano',{
+    type:'equirectangular',panorama:room.tour360,
+    autoLoad:true,showControls:true,hotSpots
+  });
+}
+
+function _renderTeHotspots(roomIdx){
+  const room=_adminRooms[roomIdx];
+  const c=document.getElementById('tour-ed-hs-list');
+  if(!room?.hotspots?.length){
+    c.innerHTML='<span style="color:#666;font-size:11px">No arrows placed yet — pan the view then click "Click to Place Arrow"</span>';
+    return;
+  }
+  c.innerHTML=room.hotspots.map((hs,i)=>{
+    const tr=_adminRooms[hs.toRoomIdx];
+    return `<div class="tour-hs-tag">→ ${escHtml(tr?.name||'Unknown')}
+      <button class="tour-hs-del" onclick="deleteHotspot(${roomIdx},${i})" title="Remove">×</button>
+    </div>`;
+  }).join('');
+}
+
+function startPlaceMode(){
+  const csel=document.getElementById('tour-ed-connect-sel');
+  if(!csel.value||!_adminRooms[parseInt(csel.value)]){
+    showToast('Select a target room first');return;
+  }
+  _placing=true;
+  document.getElementById('tour-place-overlay').style.display='block';
+  document.getElementById('tour-place-hint').style.display='block';
+  const btn=document.getElementById('tour-place-btn');
+  btn.textContent='✕ Cancel';btn.classList.add('placing');btn.onclick=cancelPlaceMode;
+}
+
+function cancelPlaceMode(){
+  _placing=false;
+  document.getElementById('tour-place-overlay').style.display='none';
+  document.getElementById('tour-place-hint').style.display='none';
+  const btn=document.getElementById('tour-place-btn');
+  if(btn){btn.textContent='📍 Click to Place Arrow';btn.classList.remove('placing');btn.onclick=startPlaceMode;}
+}
+
+function handlePlaceClick(e){
+  if(!_placing||!_teViewer) return;
+  const pano=document.getElementById('tour-ed-pano');
+  const rect=pano.getBoundingClientRect();
+  const ndcX=(e.clientX-rect.left-rect.width/2)/(rect.width/2);
+  const ndcY=(e.clientY-rect.top-rect.height/2)/(rect.height/2);
+  const hfovRad=_teViewer.getHfov()*Math.PI/180;
+  const vfovRad=2*Math.atan(Math.tan(hfovRad/2)*rect.height/rect.width);
+  const dYaw=Math.atan(ndcX*Math.tan(hfovRad/2))*180/Math.PI;
+  const dPitch=-Math.atan(ndcY*Math.tan(vfovRad/2))*180/Math.PI;
+  const yaw=((_teViewer.getYaw()+dYaw)%360+360)%360;
+  const pitch=Math.max(-90,Math.min(90,_teViewer.getPitch()+dPitch));
+  const toRoomIdx=parseInt(document.getElementById('tour-ed-connect-sel').value);
+  if(isNaN(toRoomIdx)) return;
+  if(!_adminRooms[_teRoomIdx].hotspots) _adminRooms[_teRoomIdx].hotspots=[];
+  _adminRooms[_teRoomIdx].hotspots.push({toRoomIdx,yaw,pitch});
+  cancelPlaceMode();
+  _loadTeViewer(_adminRooms[_teRoomIdx],_teRoomIdx);
+  _renderTeHotspots(_teRoomIdx);
+  showToast('Arrow placed ✓');
+}
+
+function deleteHotspot(roomIdx,hsIdx){
+  _adminRooms[roomIdx]?.hotspots?.splice(hsIdx,1);
+  _loadTeViewer(_adminRooms[roomIdx],roomIdx);
+  _renderTeHotspots(roomIdx);
+  showToast('Arrow removed');
+}
+
+function closeTourEditor(){
+  cancelPlaceMode();
+  document.getElementById('tour-editor').classList.remove('open');
+  if(_teViewer){_teViewer.destroy();_teViewer=null;}
+  document.getElementById('tour-ed-pano').innerHTML='';
+  // Refresh the "Edit Tour" button visibility based on current admin room state
+  const tw=document.getElementById('ap-tour-edit-wrap');
+  if(tw) tw.style.display=_adminRooms.some(r=>r.tour360)?'block':'none';
 }
 
 function addPhotoUrl(){
@@ -1239,6 +1520,7 @@ function collectAdminRoomValues(){
     if(i>=_adminRooms.length) return;
     const n=el.querySelector('.apr-name'); if(n) _adminRooms[i].name=n.value;
     const l=el.querySelector('.apr-link'); if(l) _adminRooms[i].link=l.value;
+    const t=el.querySelector('.apr-tour360'); if(t&&t.value.trim()) _adminRooms[i].tour360=convertDriveUrl360(t.value.trim()); else if(t) _adminRooms[i].tour360='';
   });
 }
 
@@ -1258,6 +1540,10 @@ function renderAdminRooms(){
           <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">Program Link (optional)</label>
           <input class="ap-input apr-link" type="url" value="${escHtml(room.link||'')}" placeholder="https://fhnw.edu/programs/…">
         </div>
+        <div style="margin-bottom:6px">
+          <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">360° Photo URL (optional)</label>
+          <input class="ap-input apr-tour360" type="url" value="${escHtml(room.tour360||'')}" placeholder="Paste Drive link to equirectangular 360° JPG…">
+        </div>
         <div>
           <label class="ap-label" style="font-size:9.5px;margin-bottom:3px">Photos</label>
           <div class="ap-room-photo-row">
@@ -1269,6 +1555,9 @@ function renderAdminRooms(){
       </div>`;
     c.appendChild(div);
   });
+  // Show/hide "Edit Tour" button
+  const tw=document.getElementById('ap-tour-edit-wrap');
+  if(tw) tw.style.display=_adminRooms.some(r=>r.tour360)?'block':'none';
 }
 
 function renderRoomThumbsHtml(i){
