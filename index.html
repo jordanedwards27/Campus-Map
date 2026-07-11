@@ -207,10 +207,13 @@ body.admin-on #sheets-panel{display:block;}
 }
 .ap-input:focus,.ap-select:focus,.ap-textarea:focus{border-color:var(--admin-red);}
 .ap-textarea{resize:vertical;min-height:70px;}
-.ap-thumb-wrap{position:relative;width:64px;height:48px;border-radius:4px;overflow:hidden;border:1px solid #ddd;}
-.ap-thumb-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
-.ap-thumb-del{position:absolute;top:1px;right:2px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:11px;line-height:16px;text-align:center;cursor:pointer;padding:0;}
-.ap-thumb-del:hover{background:var(--admin-red);}
+.ap-thumb-wrap{position:relative;width:72px;flex-shrink:0;border-radius:4px;overflow:hidden;border:1px solid #ddd;background:#f0f0f0;}
+.ap-thumb-wrap img{width:72px;height:54px;object-fit:cover;display:block;}
+.ap-thumb-ctrl{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.6);padding:2px 3px;}
+.ap-thumb-arr{background:none;border:none;color:#fff;font-size:13px;cursor:pointer;padding:0 2px;line-height:1;}
+.ap-thumb-arr:hover{color:var(--gold);}
+.ap-thumb-del{background:none;border:none;color:#ff8080;font-size:13px;cursor:pointer;padding:0 2px;line-height:1;}
+.ap-thumb-del:hover{color:#ff4444;}
 .ap-coords{
   background:#f8f8f8;border:1px solid #eee;border-radius:6px;
   padding:8px 12px;font-size:11px;color:#555;margin-bottom:12px;
@@ -1027,9 +1030,15 @@ function renderPhotoThumbs(){
   _adminPhotos.forEach((src,i)=>{
     const wrap=document.createElement('div'); wrap.className='ap-thumb-wrap';
     const img=document.createElement('img'); img.src=src; img.alt='';
-    const del=document.createElement('button'); del.className='ap-thumb-del'; del.textContent='×';
-    del.title='Remove'; del.onclick=()=>{_adminPhotos.splice(i,1);renderPhotoThumbs();};
-    wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
+    const ctrl=document.createElement('div'); ctrl.className='ap-thumb-ctrl';
+    const up=document.createElement('button'); up.className='ap-thumb-arr'; up.textContent='◀'; up.title='Move left';
+    up.onclick=()=>{if(i>0){[_adminPhotos[i-1],_adminPhotos[i]]=[_adminPhotos[i],_adminPhotos[i-1]];renderPhotoThumbs();}};
+    const dn=document.createElement('button'); dn.className='ap-thumb-arr'; dn.textContent='▶'; dn.title='Move right';
+    dn.onclick=()=>{if(i<_adminPhotos.length-1){[_adminPhotos[i],_adminPhotos[i+1]]=[_adminPhotos[i+1],_adminPhotos[i]];renderPhotoThumbs();}};
+    const del=document.createElement('button'); del.className='ap-thumb-del'; del.textContent='×'; del.title='Remove';
+    del.onclick=()=>{_adminPhotos.splice(i,1);renderPhotoThumbs();};
+    ctrl.appendChild(up); ctrl.appendChild(del); ctrl.appendChild(dn);
+    wrap.appendChild(img); wrap.appendChild(ctrl); container.appendChild(wrap);
   });
 }
 
@@ -1327,10 +1336,12 @@ function pushToSheets(showFeedback){
   const url=localStorage.getItem('fhnw_sheets_url');
   if(!url){if(showFeedback)sheetStatus('No Sheet connected yet','err');return;}
   if(showFeedback) sheetStatus('Saving…');
-  // no-cors avoids CORS preflight — response is opaque but data arrives fine
-  fetch(url,{method:'POST',body:JSON.stringify(BLDGS),mode:'no-cors'})
+  // Strip base64 photos before sending — they're too large for Sheets.
+  // Photos are saved in the exported HTML instead.
+  const payload=BLDGS.map(b=>({...b,photos:(b.photos||[]).filter(p=>!p.startsWith('data:'))}));
+  fetch(url,{method:'POST',body:JSON.stringify(payload),mode:'no-cors'})
     .then(()=>{
-      if(showFeedback) sheetStatus('Saved to Sheet ✓','ok');
+      if(showFeedback) sheetStatus(`Pushed ${BLDGS.length} buildings to Sheet ✓`,'ok');
       else showToast('Synced to Sheet ✓');
     })
     .catch(()=>{
