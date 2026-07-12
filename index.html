@@ -1374,8 +1374,13 @@ function _loadTeViewer(room,roomIdx){
   if(edLoad) edLoad.classList.remove('hidden');
   const hotSpots=(_adminRooms[roomIdx]?.hotspots||[]).map((hs,hi)=>{
     const tr=_adminRooms[hs.toRoomIdx];
+    const toIdx=hs.toRoomIdx;
     return{id:'hs_ed_'+hi,pitch:hs.pitch,yaw:hs.yaw,type:'info',
-           text:'→ '+(tr?.name||'Room')};
+           text:'→ '+(tr?.name||'Room')+' (click to edit)',
+           clickHandlerFunc:()=>{
+             const sel=document.getElementById('tour-ed-room-sel');
+             sel.value=toIdx; switchTeRoom(toIdx);
+           }};
   });
   _teViewer=pannellum.viewer('tour-ed-pano',{
     type:'equirectangular',panorama:room.tour360,
